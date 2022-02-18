@@ -98,4 +98,11 @@ def check_button_function(btn_variable: IntVar, *fields: Entry) -> None:
         for x in fields:
             delete_field_value(field_name=x)
             set_config(field_name=x, config="enabled")
-            
+
+
+if __name__ == "__main__":
+    root = Tk()
+    root.title("QR Invoice APP")
+    root.resizable(False, False)
+    root.mainloop()
+    
