@@ -44,3 +44,10 @@ class Widget:
         check_btn = Checkbutton(master=self.frame, text=check_button_text, variable=variable_name, command=command)
         check_btn.grid(row=row, column=col, padx=20, pady=20, columnspan=1)
         return check_btn
+
+    # Label widget
+    def label(self, label_text: str, row: int, col: int) -> Union[Label, Label]:
+        label = Label(master=self.frame, text=label_text)
+        label.grid(row=row, column=col, padx=5, pady=5)
+        return label
+    
