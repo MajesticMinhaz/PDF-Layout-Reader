@@ -71,3 +71,8 @@ def field_value(field_name: Entry) -> str:
 # Delete Edit Text field value Function
 def delete_field_value(field_name: Entry) -> None:
     return field_name.delete(0, "end")
+
+
+# Check Empty Edit Text field Function
+def is_empty(field_name: Entry) -> bool:
+    return False if len(field_value(field_name=field_name)) > 0 else True
