@@ -12,6 +12,7 @@
 from tkinter import *
 from tkinter.ttk import *
 from typing import Union
+from tkinter import messagebox
 
 
 # Basic Widget Class
@@ -50,4 +51,8 @@ class Widget:
         label = Label(master=self.frame, text=label_text)
         label.grid(row=row, column=col, padx=5, pady=5)
         return label
-    
+
+
+# Error Message Dialog Box Function
+def err_message_dialog(filed_name: str) -> None:
+    messagebox.showwarning("Empty Field", f"{filed_name} can not be empty !")
