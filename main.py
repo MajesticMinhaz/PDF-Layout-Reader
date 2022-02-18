@@ -25,3 +25,11 @@ class Widget:
         btn = Button(master=self.frame, text=text, padding=5, width=width, command=command)
         btn.grid(row=row, column=col, padx=5, pady=5)
         return btn
+
+    # Entry Widget
+    def edit_text(self, label_text: str, row: int, width: int = 65, show=None) -> Entry:
+        Label(master=self.frame, text=label_text).grid(row=row, column=0, padx=5, pady=5)
+        edit_text_value = Entry(master=self.frame, width=width, show=show)
+        edit_text_value.grid(row=row, column=1, padx=5, pady=5, columnspan=2)
+        return edit_text_value
+    
