@@ -172,8 +172,60 @@ def functional_screen(
         functional_screen_ui(enter_admin_password_text="Enter Admin Password", submit_text="Submit")
 
 
+# Admin Login screen for Create setting file
+def admin_login_screen(
+        enter_admin_password_text: str,
+        submit_text: str,
+        close_window_text: str,
+        language: str
+) -> None:
+    admin_login_screen_window = Toplevel(root)
+    admin_login_screen_window.resizable(False, False)
+
+    widget = Widget(master=admin_login_screen_window, frame_text=enter_admin_password_text)
+    user_password = widget.edit_text(label_text=enter_admin_password_text, width=30, row=0, show="*")
+    text = widget.label(label_text="", row=1, col=1)
+
+    def checking_password(passwd: Entry):
+        if is_empty(passwd):
+            text.config(text="Password can\'t be empty")
+            delete_field_value(passwd)
+        elif len(field_value(passwd)) < 8:
+            text.config(text="Length of Password should be at least 8")
+            delete_field_value(passwd)
+        elif len(field_value(passwd)) == 8 and field_value(passwd) != "12345678":
+            text.config(text="Wrong Password ! Try Again !")
+            delete_field_value(passwd)
+        elif len(field_value(passwd)) == 8 and field_value(passwd) == "12345678":
+            text.config(text="Successfully logged in.")
+            delete_field_value(passwd)
+            admin_login_screen_window.destroy()
+
+            if language == 'Arabic':
+                # create_setting_file(
+                #     input_valid_information_text='إدخال معلومات صحيحة',
+                #     submit_text=submit_text,
+                #     close_window_text=close_window_text
+                # )
+                pass
+            else:
+                # create_setting_file(
+                #     input_valid_information_text="Input Valid Information",
+                #     submit_text=submit_text,
+                #     close_window_text=close_window_text
+                # )
+                pass
+        else:
+            widget.label(label_text="Something went wrong ! Try Again", row=1, col=1)
+            passwd.delete(0, 'end')
+
+    widget.button(text=submit_text, command=lambda: checking_password(user_password), row=2, col=0, width=15)
+    widget.button(text=close_window_text, command=admin_login_screen_window.destroy, row=2, col=2, width=15)
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
     root.resizable(False, False)
+    language_choice()
     root.mainloop()
