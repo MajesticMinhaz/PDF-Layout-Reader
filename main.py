@@ -56,11 +56,11 @@ class Widget:
 
 
 # Error Message Dialog Box Function
-def err_message_dialog(filed_name: str, empty: True) -> None:
+def err_message_dialog(field_name: str, empty: bool = True) -> None:
     if empty:
-        messagebox.showwarning("Empty Field", f"{filed_name} can't be empty !")
+        messagebox.showwarning("Empty Field", f"{field_name} can't be empty !")
     elif not empty:
-        messagebox.showwarning("Invalid Input", f"{filed_name} should be whole number.")
+        messagebox.showwarning("Invalid Input", f"{field_name} should be whole number.")
     else:
         messagebox.showwarning("Wrong !", "Something went wrong !")
 
