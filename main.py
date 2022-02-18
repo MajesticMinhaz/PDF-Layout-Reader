@@ -76,3 +76,8 @@ def delete_field_value(field_name: Entry) -> None:
 # Check Empty Edit Text field Function
 def is_empty(field_name: Entry) -> bool:
     return False if len(field_value(field_name=field_name)) > 0 else True
+
+
+# Get Checkbutton status code using this Function.
+def check_btn_status(btn_variable: IntVar) -> int:
+    return btn_variable.get()
