@@ -66,3 +66,8 @@ def err_message_dialog(filed_name: str, empty: True) -> None:
 # Get Edit text field value Function
 def field_value(field_name: Entry) -> str:
     return field_name.get()
+
+
+# Delete Edit Text field value Function
+def delete_field_value(field_name: Entry) -> None:
+    return field_name.delete(0, "end")
