@@ -61,4 +61,8 @@ def err_message_dialog(filed_name: str, empty: True) -> None:
         messagebox.showwarning("Invalid Input", f"{filed_name} should be whole number.")
     else:
         messagebox.showwarning("Wrong !", "Something went wrong !")
-        
+
+
+# Get Edit text field value Function
+def field_value(field_name: Entry) -> str:
+    return field_name.get()
