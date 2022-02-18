@@ -81,3 +81,8 @@ def is_empty(field_name: Entry) -> bool:
 # Get Checkbutton status code using this Function.
 def check_btn_status(btn_variable: IntVar) -> int:
     return btn_variable.get()
+
+
+# Set Edit Text Config (disabled or enabled)
+def set_config(field_name: Entry, config: str) -> Optional[Dict[str, Tuple[str, str, str, Any, Any]]]:
+    return field_name.config(state=config)
