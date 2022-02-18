@@ -32,4 +32,15 @@ class Widget:
         edit_text_value = Entry(master=self.frame, width=width, show=show)
         edit_text_value.grid(row=row, column=1, padx=5, pady=5, columnspan=2)
         return edit_text_value
-    
+
+    # Checkbutton Widget
+    def check_button(
+            self,
+            check_button_text: str,
+            variable_name: IntVar,
+            command, row: int,
+            col: int
+    ) -> Union[Checkbutton, Checkbutton]:
+        check_btn = Checkbutton(master=self.frame, text=check_button_text, variable=variable_name, command=command)
+        check_btn.grid(row=row, column=col, padx=20, pady=20, columnspan=1)
+        return check_btn
