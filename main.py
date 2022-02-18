@@ -100,9 +100,43 @@ def check_button_function(btn_variable: IntVar, *fields: Entry) -> None:
             set_config(field_name=x, config="enabled")
 
 
+# Language Choice Screen UI part her designed
+def language_choice() -> None:
+    widget = Widget(master=root, frame_text="Select a Language :")
+    widget.button(
+        text="Arabic",
+        command=lambda: functional_screen(
+            frame_text='حدد اختيارا :',
+            create_statement_text='إنشاء البيانات',
+            create_setting_file_text='إنشاء ملف الإعداد',
+            close_window_text='أغلق النافذة',
+            language='Arabic'
+        ),
+        row=0,
+        col=0
+    )
+    widget.button(
+        text="English",
+        command=lambda: functional_screen(
+            frame_text='Select an option :',
+            create_statement_text='Create Statements',
+            create_setting_file_text='Create Setting File',
+            close_window_text='Close Window',
+            language='English'
+        ),
+        row=1,
+        col=0
+    )
+    widget.button(
+        text="Quit",
+        command=root.quit,
+        row=2,
+        col=0
+    )
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
     root.resizable(False, False)
     root.mainloop()
-    
