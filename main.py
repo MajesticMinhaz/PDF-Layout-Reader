@@ -135,6 +135,43 @@ def language_choice() -> None:
     )
 
 
+# Functional Screen Function
+def functional_screen(
+        frame_text: str,
+        create_statement_text: str,
+        create_setting_file_text: str,
+        close_window_text: str,
+        language: str
+) -> None:
+    def functional_screen_ui(enter_admin_password_text: str, submit_text: str) -> None:
+        functional_screen_window = Toplevel(master=root)
+        functional_screen_window.resizable(False, False)
+        widget = Widget(master=functional_screen_window, frame_text=frame_text)
+        widget.button(
+            text=create_statement_text,
+            command=create_statement,
+            row=0,
+            col=0
+        )
+        widget.button(
+            text=create_setting_file_text,
+            command=lambda: admin_login_screen(
+                enter_admin_password_text=enter_admin_password_text,
+                submit_text=submit_text,
+                close_window_text=close_window_text,
+                language=language
+            ),
+            row=1,
+            col=0
+        )
+        widget.button(text=close_window_text, command=functional_screen_window.destroy, row=2, col=0)
+
+    if language == "Arabic":
+        functional_screen_ui(enter_admin_password_text='أدخل كلمة مرور المسؤول :', submit_text='إرسال')
+    else:
+        functional_screen_ui(enter_admin_password_text="Enter Admin Password", submit_text="Submit")
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
