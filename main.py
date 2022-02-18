@@ -102,6 +102,19 @@ def check_button_function(btn_variable: IntVar, *fields: Entry) -> None:
             set_config(field_name=x, config="enabled")
 
 
+# File select Edit text function.
+def file_select(field_name: Entry, *field: str) -> None:
+    delete_field_value(field_name=field_name)
+    file_path = filedialog.askopenfilename(
+        title=field[0],
+        filetypes=[(field[1], field[2])]
+    )
+    if field[3] == "False":
+        field_name.insert(0, os.path.dirname(file_path))
+    else:
+        field_name.insert(0, file_path)
+
+
 # Language Choice Screen UI part her designed
 def language_choice() -> None:
     widget = Widget(master=root, frame_text="Select a Language :")
