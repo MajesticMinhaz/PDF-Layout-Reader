@@ -86,3 +86,16 @@ def check_btn_status(btn_variable: IntVar) -> int:
 # Set Edit Text Config (disabled or enabled)
 def set_config(field_name: Entry, config: str) -> Optional[Dict[str, Tuple[str, str, str, Any, Any]]]:
     return field_name.config(state=config)
+
+
+def check_button_function(btn_variable: IntVar, *fields: Entry) -> None:
+    btn_status = check_btn_status(btn_variable=btn_variable)
+    if btn_status == 0:
+        for x in fields:
+            delete_field_value(field_name=x)
+            set_config(field_name=x, config="disabled")
+    else:
+        for x in fields:
+            delete_field_value(field_name=x)
+            set_config(field_name=x, config="enabled")
+            
