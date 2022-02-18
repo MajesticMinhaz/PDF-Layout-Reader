@@ -217,19 +217,17 @@ def admin_login_screen(
             admin_login_screen_window.destroy()
 
             if language == 'Arabic':
-                # create_setting_file(
-                #     input_valid_information_text='إدخال معلومات صحيحة',
-                #     submit_text=submit_text,
-                #     close_window_text=close_window_text
-                # )
-                pass
+                create_setting_file(
+                    input_valid_information_text='إدخال معلومات صحيحة',
+                    submit_text=submit_text,
+                    close_window_text=close_window_text
+                )
             else:
-                # create_setting_file(
-                #     input_valid_information_text="Input Valid Information",
-                #     submit_text=submit_text,
-                #     close_window_text=close_window_text
-                # )
-                pass
+                create_setting_file(
+                    input_valid_information_text="Input Valid Information",
+                    submit_text=submit_text,
+                    close_window_text=close_window_text
+                )
         else:
             widget.label(label_text="Something went wrong ! Try Again", row=1, col=1)
             passwd.delete(0, 'end')
