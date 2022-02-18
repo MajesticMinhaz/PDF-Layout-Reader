@@ -238,6 +238,202 @@ def admin_login_screen(
     widget.button(text=close_window_text, command=admin_login_screen_window.destroy, row=2, col=2, width=15)
 
 
+# Create setting file function here covered
+def create_setting_file(
+        input_valid_information_text: str,
+        submit_text: str,
+        close_window_text: str
+) -> None:
+    setting_screen_window = Toplevel(master=root)
+    setting_screen_window.resizable(False, False)
+
+    widget = Widget(master=setting_screen_window, frame_text=input_valid_information_text)
+
+    username = widget.edit_text(label_text="Username", row=0)
+    admin_password = widget.edit_text(label_text="Admin Password", row=1, show="*")
+
+    output_file_name = widget.edit_text(label_text="Filename (*.env)", row=2)
+    output_file_name.insert(0, "setting.env")
+    set_config(field_name=output_file_name, config="disabled")
+
+    company_name = widget.edit_text(label_text="Company Name", row=3)
+    qr_location_x = widget.edit_text(label_text="QR Location X (cm)", row=4)
+    qr_location_y = widget.edit_text(label_text="QR Location Y (cm)", row=5)
+    qr_size = widget.edit_text(label_text="QR Code Size (cm)", row=6)
+
+    # ----------------------------- Only for Local drive folder location -------------------------------
+    local_drive_folder_location = widget.edit_text(label_text="Local Drive Folder Location", row=7)
+    local_drive_folder_location.insert(0, "Select a file")
+    local_drive_folder_location.bind(
+        "<Button-1>", lambda a="Select any file", b="Any File", c="*.*", d="False": file_select(
+            local_drive_folder_location, a, b, c, d
+        )
+    )
+
+    # -------------------------------------------------------------------------------------------------
+    # ------------------------------------Checkbutton here start-------------------------------------
+
+    google_drive_check_btn_status = IntVar()
+    widget.check_button(
+        check_button_text="Google Drive Folder",
+        variable_name=google_drive_check_btn_status,
+        command=lambda: check_button_function(
+            google_drive_check_btn_status,
+            google_drive_access_token,
+            google_drive_folder_id
+        ),
+        row=8,
+        col=0
+    )
+
+    # ---------------------------------- Google Drive Checkbutton end here----------------------------------------
+
+    # ---------------------------------- OneDrive Checkbutton here start------------------------------------------
+
+    one_drive_folder_check_btn_status = IntVar()
+    widget.check_button(
+        check_button_text="OneDrive Folder",
+        variable_name=one_drive_folder_check_btn_status,
+        command=lambda: check_button_function(
+            one_drive_folder_check_btn_status,
+            one_drive_folder
+        ),
+        row=8,
+        col=1
+    )
+
+    # ---------------------------------- OneDrive Checkbutton end here------------------------------------------
+
+    # ---------------------------------- FTP server Checkbutton here start------------------------------------------
+
+    ftp_server_check_btn_status = IntVar()
+    widget.check_button(
+        check_button_text="FTP Server",
+        variable_name=ftp_server_check_btn_status,
+        command=lambda: check_button_function(
+            ftp_server_check_btn_status,
+            ftp_ip,
+            ftp_username,
+            ftp_password,
+            ftp_folder_location
+        ),
+        row=8,
+        col=2
+    )
+    # ----------------------------------FTP Server Checkbutton here end------------------------------------------
+    # ----------------------------------Checkbutton here end------------------------------------------
+
+    google_drive_access_token = widget.edit_text(label_text="Access Token", row=9)
+    google_drive_folder_id = widget.edit_text(label_text="Google Drive Folder ID", row=10)
+
+    one_drive_folder = widget.edit_text(label_text="OneDrive Folder", row=11)
+
+    ftp_ip = widget.edit_text(label_text="FTP IP", row=12)
+    ftp_username = widget.edit_text(label_text="FTP Username", row=13)
+    ftp_password = widget.edit_text(label_text="FTP Password", row=14, show="*")
+    ftp_folder_location = widget.edit_text(label_text="FTP Folder Location", row=15)
+
+    # -------------------------------------------------------------------------------------------------
+    # disable all additional fields without local drive field
+    set_config(field_name=google_drive_access_token, config="disabled")
+    set_config(field_name=google_drive_folder_id, config="disabled")
+    set_config(field_name=one_drive_folder, config="disabled")
+    set_config(field_name=ftp_ip, config="disabled")
+    set_config(field_name=ftp_username, config="disabled")
+    set_config(field_name=ftp_password, config="disabled")
+    set_config(field_name=ftp_folder_location, config="disabled")
+
+    # -------------------------------------------------------------------------------------------------
+    def checking_input_validity() -> None:
+        if is_empty(username):
+            err_message_dialog("Username")
+        elif is_empty(admin_password):
+            err_message_dialog('Admin Password')
+        elif is_empty(company_name):
+            err_message_dialog('Company Name')
+        elif is_empty(qr_location_x):
+            err_message_dialog("QR Code Location X (cm)")
+        elif is_empty(qr_location_y):
+            err_message_dialog("QR Code Location Y (cm)")
+        elif is_empty(qr_size):
+            err_message_dialog("QR code box size (cm)")
+        elif is_empty(local_drive_folder_location) or field_value(local_drive_folder_location) == 'Select a file':
+            err_message_dialog("Local Drive Folder Location")
+        elif check_btn_status(google_drive_check_btn_status) == 1 and is_empty(google_drive_access_token):
+            err_message_dialog("Google Drive Access Token")
+        elif check_btn_status(google_drive_check_btn_status) == 1 and is_empty(google_drive_folder_id):
+            err_message_dialog("Google Drive Folder ID")
+        elif check_btn_status(one_drive_folder_check_btn_status) == 1 and is_empty(one_drive_folder):
+            err_message_dialog("OneDrive Folder")
+        elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_ip):
+            err_message_dialog("FTP IP")
+        elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_username):
+            err_message_dialog("FTP Username")
+        elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_password):
+            err_message_dialog("FTP Password")
+        elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_folder_location):
+            err_message_dialog("FTP Folder Location")
+        elif field_value(username) != "root2020":
+            err_message_dialog("Username", False)
+        elif field_value(admin_password) != "12345678":
+            err_message_dialog("Admin Password", False)
+        elif not field_value(qr_location_x).isdigit():
+            err_message_dialog("QR Code Location X (cm)", False)
+        elif not field_value(qr_location_y).isdigit():
+            err_message_dialog("QR Code Location Y (cm)", False)
+        elif not field_value(qr_size).isdigit():
+            err_message_dialog("QR Code Size (cm)", False)
+        else:
+            user_input = {
+                "username": field_value(username),
+                "password": field_value(admin_password),
+                "setting_file_name": field_value(output_file_name),
+                "company_name": field_value(company_name),
+                "qr_location_x": field_value(qr_location_x),
+                "qr_location_y": field_value(qr_location_y),
+                "qr_size": field_value(qr_size),
+                "local_drive_folder_location": field_value(local_drive_folder_location),
+                "google_drive_access_token": field_value(google_drive_access_token),
+                "google_drive_folder_id": field_value(google_drive_folder_id),
+                "one_drive_folder": field_value(one_drive_folder),
+                "ftp_ip": field_value(ftp_ip),
+                "ftp_username": field_value(ftp_username),
+                "ftp_password": field_value(ftp_password),
+                "ftp_folder_location": field_value(ftp_folder_location)
+            }
+
+            messagebox.showinfo("Successful !", f"Successfully created setting.env file inside :\n"
+                                                f"{field_value(local_drive_folder_location)}")
+
+            # Deleting all value from current screen
+            delete_field_value(username)
+            delete_field_value(admin_password)
+            delete_field_value(company_name)
+            delete_field_value(qr_location_x)
+            delete_field_value(qr_location_y)
+            delete_field_value(qr_size)
+            delete_field_value(local_drive_folder_location)
+            delete_field_value(google_drive_access_token)
+            delete_field_value(google_drive_folder_id)
+            delete_field_value(one_drive_folder)
+            delete_field_value(ftp_ip)
+            delete_field_value(ftp_username)
+            delete_field_value(ftp_password)
+            delete_field_value(ftp_folder_location)
+
+            write_setting_file_func(values=user_input)
+
+    widget.button(
+        text=submit_text,
+        command=lambda: checking_input_validity(),
+        row=16,
+        col=0,
+        width=16
+    )
+    widget.button(text="Log File", command=None, row=16, col=1, width=16)
+    widget.button(text=close_window_text, command=setting_screen_window.destroy, row=16, col=2, width=16)
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
