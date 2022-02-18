@@ -11,7 +11,7 @@
 """
 from tkinter import *
 from tkinter.ttk import *
-from typing import Union
+from typing import Union, Optional, Dict, Tuple, Any
 from tkinter import messagebox
 
 
