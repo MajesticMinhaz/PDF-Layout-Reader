@@ -642,9 +642,200 @@ def create_statement() -> None:
     )
 
 
+def checking_value(
+        master: Toplevel,
+        widget: Widget,
+        setting_file_path: Entry,
+        pdf_file_path: Entry,
+        next_button: Union[Button, Button],
+        close_button: Union[Button, Button]
+) -> None:
+    global pdf_date, pdf_vat_number, hour, minute, second, year, day, month
+    if is_empty(setting_file_path):
+        err_message_dialog(field_name="setting file's path")
+    elif is_empty(pdf_file_path):
+        err_message_dialog(field_name="PDF file's path")
+    else:
+        set_config(field_name=setting_file_path, config="disabled")
+        set_config(field_name=pdf_file_path, config="disabled")
+        next_button.destroy()
+        close_button.destroy()
+        # Read PDF file
+        with open(field_value(pdf_file_path), 'rb') as read_pdf:
+            pdf_page_obj = pdftotext.PDF(pdf_file=read_pdf)
+        pdf_all_text = "\n\n".join(pdf_page_obj)
+        pdf_page_text_list = pdf_all_text.split()
+        try:
+            # get date and vat number from pdf file
+            pdf_date = list(filter(lambda item: date_rag.match(item), pdf_page_text_list))[0]
+            pdf_vat_number = list(filter(lambda item: vat_num_rag.match(item), pdf_page_text_list))[0]
+        except ValueError as e:
+            print('Some value is missing in pdf file.', e)
+            messagebox.showerror('Invalid Format', 'Your pdf file is Invalid Format.')
+
+        try:
+            ntp_client = ntplib.NTPClient()
+            response = ntp_client.request('pool.ntp.org', timeout=2)
+            hour = str(datetime.fromtimestamp(response.tx_time).hour)
+            minute = str(datetime.fromtimestamp(response.tx_time).minute)
+            second = str(datetime.fromtimestamp(response.tx_time).second)
+        except ntplib.NTPException as e:
+            hour = str(datetime.fromtimestamp(time.time()).hour)
+            minute = str(datetime.fromtimestamp(time.time()).minute)
+            second = str(datetime.fromtimestamp(time.time()).second)
+            print(f'Tried using NTP server but it was not reachable so instead used system time\nError: {e}')
+
+        # formatting time
+        def check_digit(digit: str) -> str:
+            return f'0{digit}' if len(digit) < 2 else digit
+
+        # final time output
+        hour = check_digit(hour)
+        minute = check_digit(minute)
+        second = check_digit(second)
+
+        # checking info
+        date_time = datetime.now()
+        if pdf_date is not None:
+            date_data = pdf_date.split(re.findall(r'[./-]', pdf_date)[0])
+
+            year = list(filter(lambda a: re.search(r'[0-9]{4}', a), date_data))[0]
+            day = date_data[0]
+
+            try:
+                month_list = list(calendar.month_abbr)
+                lower_date = pdf_date.lower()
+                month_index = str(month_list.index(
+                    list(filter(lambda a: re.findall(a.lower(), lower_date), month_list[1:]))[0]
+                ))
+                month_index = check_digit(month_index)
+            except ValueError:
+                month_index = date_data[1]
+            pdf_date = f'{year}-{month_index}-{day} {hour}:{minute}:{second}'
+        else:
+            pdf_date = date_time.strftime(f'%Y-%m-%d {hour}:{minute}:{second}')
+
+        setting_data = read_setting_file_func(path=field_value(setting_file_path))
+
+        widget.label(label_text=f"Company Name: {setting_data['company_name']}", row=2, col=1)
+        widget.label(label_text=f"Date: {pdf_date}", row=3, col=1)
+        widget.label(label_text=f"VAT Number : {pdf_vat_number}", row=4, col=1)
+        widget.label(label_text=f"QR Location X (cm): {setting_data['qr_loc_x']}", row=5, col=1)
+        widget.label(label_text=f"QR Location Y (cm): {setting_data['qr_loc_y']}", row=6, col=1)
+        widget.label(label_text=f"QR Code Size (cm): {setting_data['qr_size']}", row=7, col=1)
+
+        vat_amount = widget.edit_text(label_text="VAT", row=8)
+        total_amount = widget.edit_text(label_text="Total", row=9)
+
+        # Prepare QR Code
+        def prepare_result_file() -> None:
+            global qr_text
+            qr_text = TLV()
+            qr_text[0x01] = setting_data["company_name"].encode('UTF-8')
+            qr_text[0x02] = pdf_vat_number.encode('UTF-8')
+            qr_text[0x03] = pdf_date.encode('UTF-8')
+            qr_text[0x04] = total.encode('UTF-8')
+            qr_text[0x05] = vat.encode('UTF-8')
+            print(qr_text)
+            qr_text = base64.b64encode(qr_text.to_byte_array())
+            qr_code = qrcode.QRCode(
+                version=2,
+                box_size=25,
+                border=5
+            )
+            qr_code.add_data(data=qr_text)
+            qr_code.make(fit=True)
+            image = qr_code.make_image(fill='black')
+            image_path = os.path.join(os.path.dirname(field_value(pdf_file_path)), 'qr_code.png')
+            qr_code_pdf_file_path = os.path.join(os.path.dirname(field_value(pdf_file_path)), 'qr_code.pdf')
+            pdf = canvas.Canvas(qr_code_pdf_file_path)
+            image.save(image_path)
+            pdf.drawImage(
+                image=image_path,
+                x=int(setting_data["qr_loc_x"]) * 37.79,
+                y=int(setting_data["qr_loc_y"]) * 37.79,
+                width=int(setting_data["qr_size"]) * 37.79,
+                height=int(setting_data["qr_size"]) * 37.79,
+                preserveAspectRatio=True,
+                mask='auto'
+            )
+            pdf.save()
+
+            # read qr_code.pdf file
+            f = open(qr_code_pdf_file_path, 'rb')
+            qr_code_file = PdfFileReader(f)
+
+            # output file ready
+            output_file = PdfFileWriter()
+            input_pdf_file = open(field_value(pdf_file_path), 'rb')
+            input_pdf_file_read = PdfFileReader(input_pdf_file)
+
+            # get number of page in document
+            page_count = input_pdf_file_read.getNumPages()
+
+            # Go through all the input file pages to add a QrCode to them
+            for page_number in range(page_count):
+                # merge the QrCode with the page
+                input_page = input_pdf_file_read.getPage(page_number)
+                input_page.mergePage(qr_code_file.getPage(0))
+                # add page from input file to output document
+                output_file.addPage(input_page)
+                # finally, write "output" to document-output.pdf
+            output_file_name = os.path.join(os.path.dirname(field_value(pdf_file_path)), 'result.pdf')
+            with open(output_file_name, "wb") as outputStream:
+                output_file.write(outputStream)
+            f.close()
+            input_pdf_file.close()
+            os.remove(image_path)
+            os.remove(qr_code_pdf_file_path)
+            messagebox.showinfo(
+                title="Successfully created !",
+                message=f"Successfully Created result.pdf file !\nPath: {output_file_name}"
+            )
+            master.destroy()
+
+        def checking_vat_and_total() -> None:
+            global vat, total
+            if is_empty(vat_amount):
+                err_message_dialog(field_name="VAT")
+            elif is_empty(total_amount):
+                err_message_dialog(field_name="Total")
+            else:
+                vat = field_value(vat_amount)
+                total = field_value(total_amount)
+                prepare_result_file()
+
+        widget.button(
+            text="Submit",
+            command=checking_vat_and_total,
+            row=10,
+            col=1
+        )
+
+        widget.button(
+            text="Close Window",
+            command=master.destroy,
+            row=10,
+            col=2
+        )
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
     root.resizable(False, False)
+    date_rag = re.compile(r"^([0-9]+|[A-Za-z]+)[/. -]([0-9]+|[A-Za-z]+)[/. -]([0-9]+|[A-Za-z]+)$")
+    vat_num_rag = re.compile(r"(^[1]([0-9]{14}$))")
+    pdf_date = None
+    pdf_vat_number = None
+    hour = None
+    minute = None
+    second = None
+    year = None
+    day = None
+    month = None
+    vat = str()
+    total = str()
+    qr_text = None
     language_choice()
     root.mainloop()
