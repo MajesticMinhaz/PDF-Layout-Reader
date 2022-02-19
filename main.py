@@ -786,7 +786,7 @@ def checking_value(
                 # finally, write "output" to document-output.pdf
             output_file_name = os.path.join(
                 os.path.dirname(field_value(pdf_file_path)),
-                f'{Path(field_value(pdf_file_path)).stem}-result.pdf'
+                f'{Path(field_value(pdf_file_path)).stem}-QR.pdf'
             )
             with open(output_file_name, "wb") as outputStream:
                 output_file.write(outputStream)
