@@ -620,129 +620,21 @@ def create_statement() -> None:
         )
     )
 
-    # def checking_value() -> None:
-    #     global pdf_date, pdf_vat_number, hour, minute, second, year, day, month
-    #     if is_empty_field(setting_file_path):
-    #         err_message_dialog(input_name="setting file's path")
-    #     elif is_empty_field(pdf_file_path):
-    #         err_message_dialog(input_name="input pdf file's path")
-    #     else:
-    #         set_config_edit_text(field_name=setting_file_path, config_text="disabled")
-    #         set_config_edit_text(field_name=pdf_file_path, config_text="disabled")
-    #
-    #         # Read PDF file
-    #         with open(field_value(pdf_file_path), 'rb') as read_pdf:
-    #             pdf_page_obj = pdftotext.PDF(pdf_file=read_pdf)
-    #         pdf_all_text = "\n\n".join(pdf_page_obj)
-    #         pdf_page_text_list = pdf_all_text.split()
-    #         try:
-    #             # get date and vat number from pdf file
-    #             pdf_date = list(filter(lambda item: date_rag.match(item), pdf_page_text_list))[0]
-    #             pdf_vat_number = list(filter(lambda item: vat_num_rag.match(item), pdf_page_text_list))[0]
-    #         except ValueError as e:
-    #             print('Some value is missing in pdf file.')
-    #             print(e)
-    #             messagebox.showerror('Invalid Format', 'Your pdf file is Invalid Format.')
-    #
-    #         ntp_client = ntplib.NTPClient()
-    #         try:
-    #             response = ntp_client.request('pool.ntp.org')
-    #             hour = str(datetime.fromtimestamp(response.tx_time).hour)
-    #             minute = str(datetime.fromtimestamp(response.tx_time).minute)
-    #             second = str(datetime.fromtimestamp(response.tx_time).second)
-    #         except ConnectionError as e:
-    #             hour = str(datetime.fromtimestamp(time.time()).hour)
-    #             minute = str(datetime.fromtimestamp(time.time()).minute)
-    #             second = str(datetime.fromtimestamp(time.time()).second)
-    #             print(f'Tried using NTP server but it was not reachable so instead used system time\nError: {e}')
-    #
-    #         # formatting time
-    #         def check_digit(digit: str) -> str:
-    #             return f'0{digit}' if len(digit) < 2 else digit
-    #
-    #         # final time output
-    #         hour = check_digit(hour)
-    #         minute = check_digit(minute)
-    #         second = check_digit(second)
-    #
-    #         # checking info
-    #         date_time = datetime.now()
-    #         if pdf_date is not None:
-    #             date_data = pdf_date.split(re.findall(r'[\.\/-]', pdf_date)[0])
-    #
-    #             year = list(filter(lambda a: re.search(r'[0-9]{4}', a), date_data))[0]
-    #             day = date_data[0]
-    #
-    #             try:
-    #                 month_list = list(calendar.month_abbr)
-    #                 lower_date = pdf_date.lower()
-    #                 month_index = str(month_list.index(
-    #                     list(filter(lambda a: re.findall(a.lower(), lower_date), month_list[1:]))[0]
-    #                 ))
-    #                 month_index = check_digit(month_index)
-    #             except ValueError:
-    #                 month_index = date_data[1]
-    #             pdf_date = f'{year}-{month_index}-{day} {hour}:{minute}:{second}'
-    #         else:
-    #             pdf_date = date_time.strftime(f'%Y-%m-%d {hour}:{minute}:{second}')
-    #
-    #         setting_data = read_setting_file_func(path=field_value(setting_file_path))
-    #
-    #         widget.label(label_text=f"Company Name: {setting_data['company_name']}", row=3, col=1)
-    #         widget.label(label_text=f"Date: {pdf_date}", row=4, col=1)
-    #         widget.label(label_text=f"VAT Number : {pdf_vat_number}", row=5, col=1)
-    #         widget.label(label_text=f"QR Location X (cm): {setting_data['qr_loc_x']}", row=6, col=1)
-    #         widget.label(label_text=f"QR Location Y (cm): {setting_data['qr_loc_y']}", row=7, col=1)
-    #         widget.label(label_text=f"QR Code Size (cm): {setting_data['qr_size']}", row=8, col=1)
-    #
-    #         vat_amount = widget.edit_text(label_text="VAT", row=9)
-    #         total_amount = widget.edit_text(label_text="Total", row=10)
-    #
-    #         # Prepare QR Code
-    #         def prepare_qr_code_text() -> None:
-    #             global qr_text
-    #             qr_text = TLV()
-    #             qr_text[0x01] = setting_data["company_name"].encode('UTF-8')
-    #             qr_text[0x02] = pdf_vat_number.encode('UTF-8')
-    #             qr_text[0x03] = pdf_date.encode('UTF-8')
-    #             qr_text[0x04] = total.encode('UTF-8')
-    #             qr_text[0x05] = vat.encode('UTF-8')
-    #             print(qr_text)
-    #             qr_text = base64.b64encode(qr_text.to_byte_array())
-    #             create_qr_code(
-    #                 pdf_file_path=field_value(pdf_file_path),
-    #                 qr_loc_x=int(setting_data["qr_loc_x"]),
-    #                 qr_loc_y=int(setting_data["qr_loc_y"]),
-    #                 qr_size=int(setting_data["qr_size"]),
-    #                 base_screen=create_statement_file_input_window
-    #             )
-    #
-    #         def checking_vat_and_total() -> None:
-    #             global vat, total
-    #             if is_empty_field(vat_amount):
-    #                 err_message_dialog(input_name="VAT")
-    #             elif is_empty_field(total_amount):
-    #                 err_message_dialog(input_name="Total")
-    #             else:
-    #                 vat = field_value(vat_amount)
-    #                 total = field_value(total_amount)
-    #                 prepare_qr_code_text()
-    #
-    #         widget.button(
-    #             text="Submit",
-    #             command=checking_vat_and_total,
-    #             row=11,
-    #             col=2
-    #         )
-
-    widget.button(
+    next_btn = widget.button(
         text="Next",
-        command=None,
+        command=lambda: checking_value(
+            master=create_statement_file_input_window,
+            widget=widget,
+            setting_file_path=setting_file_path,
+            pdf_file_path=pdf_file_path,
+            next_button=next_btn,
+            close_button=close_btn
+        ),
         row=2,
         col=1
     )
 
-    widget.button(
+    close_btn = widget.button(
         text="Close Window",
         command=create_statement_file_input_window.destroy,
         row=2,
