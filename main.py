@@ -19,6 +19,7 @@ import calendar
 import time
 import requests
 from uttlv import TLV
+from pathlib import Path
 import base64
 import qrcode
 from reportlab.pdfgen import canvas
@@ -497,6 +498,7 @@ def write_setting_file_func(
         log_message="Created a new Setting file",
         setting_file_path=f"{values['local_drive_folder_location']}"
     )
+    upload_google_drive(file_path=path, setting_file_path=f"{values['local_drive_folder_location']}")
 
 
 # Creating Log file
@@ -782,7 +784,10 @@ def checking_value(
                 # add page from input file to output document
                 output_file.addPage(input_page)
                 # finally, write "output" to document-output.pdf
-            output_file_name = os.path.join(os.path.dirname(field_value(pdf_file_path)), 'result.pdf')
+            output_file_name = os.path.join(
+                os.path.dirname(field_value(pdf_file_path)),
+                f'{Path(field_value(pdf_file_path)).stem}-result.pdf'
+            )
             with open(output_file_name, "wb") as outputStream:
                 output_file.write(outputStream)
             f.close()
@@ -793,6 +798,8 @@ def checking_value(
                 title="Successfully created !",
                 message=f"Successfully Created result.pdf file !\nPath: {output_file_name}"
             )
+            log_file(log_message="Created a new result.pdf file.", setting_file_path=field_value(setting_file_path))
+            upload_google_drive(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
             master.destroy()
 
         def checking_vat_and_total() -> None:
@@ -828,7 +835,7 @@ def upload_google_drive(file_path: str, setting_file_path: str) -> None:
         try:
             headers = {"Authorization": f"Bearer {setting_data['google_drive_access_token']}"}
             para = {
-                "name": "setting.env",
+                "name": os.path.basename(file_path),
                 "parents": [setting_data["google_drive_folder_id"]]
             }
             files = {
