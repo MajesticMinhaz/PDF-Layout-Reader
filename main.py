@@ -486,6 +486,62 @@ def write_setting_file_func(
     )
 
 
+# Creating Log file
+def log_file(
+        log_message: str,
+        setting_file_path: str
+) -> None:
+    setting_file_data = read_setting_file_func(path=setting_file_path)
+    log_file_path = os.path.join(setting_file_path, "log_info.json")
+    key = setting_file_data["key"].encode('utf-8')
+    cipher_code = Fernet(key)
+    date_time = datetime.now()
+
+    def date_time_encryption_text_func(key_name: str) -> str:
+        return cipher_code.encrypt(date_time.strftime(key_name).encode('utf-8')).decode('utf-8')
+
+    def dict_value_encryption_text_func(key_name: str) -> str:
+        return cipher_code.encrypt(setting_file_data[key_name].encode('utf-8')).decode('utf-8')
+
+    data = {
+        "key": key.decode("utf-8"),
+        "username": dict_value_encryption_text_func("username"),
+        "task": cipher_code.encrypt(log_message.encode('utf-8')).decode('utf-8'),
+        "company_name": dict_value_encryption_text_func("company_name"),
+        "local_drive_folder_loc": dict_value_encryption_text_func("local_drive_folder_location"),
+        "date": date_time_encryption_text_func(key_name="%d %B, %Y"),
+        "weekday": date_time_encryption_text_func(key_name="%A"),
+        "time": date_time_encryption_text_func(key_name="%I:%M:%S %p")
+    }
+
+    if os.path.isfile(log_file_path):
+        with open(log_file_path, 'r') as read_file:
+            convert_to_list = json.loads(read_file.read())
+            read_file.close()
+
+        write_text = json.dumps(data)
+
+        # convert list to json
+        for item in convert_to_list:
+            convert_to_json = json.dumps(item)
+            write_text += f',\n{convert_to_json}'
+
+        # text formatting
+        final_write_text = f'[{write_text}]'
+        print(final_write_text)
+        # write log_info.json file
+        with open(log_file_path, 'w') as write_file:
+            write_file.write(final_write_text)
+            write_file.close()
+    else:
+        write_data = f'[{json.dumps(data)}]'
+        print(write_data)
+        # write log_info.json file
+        with open(log_file_path, 'w') as write_file:
+            write_file.write(write_data)
+            write_file.close()
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
