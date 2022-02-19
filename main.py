@@ -433,6 +433,57 @@ def create_setting_file(
     widget.button(text=close_window_text, command=setting_screen_window.destroy, row=16, col=2, width=16)
 
 
+# Write setting file
+def write_setting_file_func(
+        values: dict
+) -> None:
+    # creating key
+    key = Fernet.generate_key()
+    cipher_code = Fernet(key)
+
+    def encryption_func(key_name: str) -> str:
+        return cipher_code.encrypt(values[key_name].encode('utf-8')).decode('utf-8')
+
+    # Getting all values from user input
+    key = key.decode('utf-8')
+    username = encryption_func(key_name="username")
+    admin_password = encryption_func(key_name="password")
+    setting_file_name = encryption_func(key_name="setting_file_name")
+    company_name = encryption_func(key_name="company_name")
+    qr_location_x = encryption_func(key_name="qr_location_x")
+    qr_location_y = encryption_func(key_name="qr_location_y")
+    qr_size = encryption_func(key_name="qr_size")
+    local_drive_folder_location = encryption_func(key_name="local_drive_folder_location")
+    google_drive_access_token = encryption_func(key_name="google_drive_access_token")
+    google_drive_folder_id = encryption_func(key_name="google_drive_folder_id")
+    one_drive_folder = encryption_func(key_name="one_drive_folder")
+    ftp_ip = encryption_func(key_name="ftp_ip")
+    ftp_username = encryption_func(key_name="ftp_username")
+    ftp_password = encryption_func(key_name="ftp_password")
+    ftp_folder_location = encryption_func(key_name="ftp_folder_location")
+
+    # Creating File template here
+    template = f"KEY={key}\nADMIN_USERNAME={username}\nPASSWORD={admin_password}\nFILE_NAME={setting_file_name}\n" \
+               f"COMPANY_NAME={company_name}\nQR_LOC_X={qr_location_x}\nQR_LOC_Y={qr_location_y}\nQR_SIZE={qr_size}\n" \
+               f"LOCAL_FILE_LOC={local_drive_folder_location}\nGOOGLE_DRIVE_TOKEN={google_drive_access_token}\n" \
+               f"GOOGLE_DRIVE_FOLDER_ID={google_drive_folder_id}\nONE_DRIVE_FOLDER={one_drive_folder}\n" \
+               f"FTP_IP={ftp_ip}\nFTP_USERNAME={ftp_username}\nFTP_PASSWORD={ftp_password}\n" \
+               f"FTP_FOLDER_LOC={ftp_folder_location}\n"
+
+    # Creating setting file path
+    path = os.path.join(values["local_drive_folder_location"], "setting.env")
+
+    # write setting file now
+    with open(path, 'w') as write:
+        write.write(template)
+        write.close()
+
+    log_file(
+        log_message="Created a new Setting file",
+        setting_file_path=f"{values['local_drive_folder_location']}"
+    )
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
