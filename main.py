@@ -543,6 +543,45 @@ def log_file(
             write_file.close()
 
 
+# Read setting file
+def read_setting_file_func(
+        path: str
+) -> dict:
+    setting_file_absolute_path = os.path.join(path, "setting.env")
+    try:
+        load_dotenv(setting_file_absolute_path)
+        key = os.getenv('KEY').encode('utf-8')
+        cipher_code = Fernet(key)
+
+        # decryption shortcut function
+        def decryption_func(key_name: str) -> str:
+            return cipher_code.decrypt(bytes(os.getenv(key_name), 'utf-8')).decode('utf-8')
+
+        data = {
+            "key": key.decode('utf-8'),
+            "username": decryption_func(key_name='ADMIN_USERNAME'),
+            "admin_password": decryption_func(key_name='PASSWORD'),
+            "file_name": decryption_func(key_name='FILE_NAME'),
+            "company_name": decryption_func(key_name='COMPANY_NAME'),
+            "qr_loc_x": decryption_func(key_name='QR_LOC_X'),
+            "qr_loc_y": decryption_func(key_name='QR_LOC_Y'),
+            "qr_size": decryption_func(key_name='QR_SIZE'),
+            "local_drive_folder_location": decryption_func(key_name='LOCAL_FILE_LOC'),
+            "google_drive_access_token": decryption_func(key_name='GOOGLE_DRIVE_TOKEN'),
+            "google_drive_folder_id": decryption_func(key_name='GOOGLE_DRIVE_FOLDER_ID'),
+            "one_drive_folder": decryption_func(key_name='ONE_DRIVE_FOLDER'),
+            "ftp_ip": decryption_func(key_name='FTP_IP'),
+            "ftp_username": decryption_func(key_name='FTP_USERNAME'),
+            "ftp_password": decryption_func(key_name='FTP_PASSWORD'),
+            "ftp_folder_location": decryption_func(key_name='FTP_FOLDER_LOC')
+        }
+        return data
+    except ValueError as e:
+        messagebox.showerror("Value Not Found !", "Some Values not found in this setting file.\n"
+                                                  "Please Create a new one.")
+        print(f"Value Not Found !\n{e}")
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
