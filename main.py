@@ -13,6 +13,7 @@ import os
 from tkinter import *
 from tkinter.ttk import *
 from typing import Union, Optional, Dict, Tuple, Any
+from cryptography.fernet import Fernet
 from tkinter import messagebox
 from tkinter import filedialog
 
