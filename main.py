@@ -11,7 +11,18 @@
 """
 import os
 import json
+import re
+import pdftotext
+import ntplib
 from datetime import datetime
+import calendar
+import time
+from uttlv import TLV
+import base64
+import qrcode
+from reportlab.pdfgen import canvas
+from PyPDF2 import PdfFileWriter
+from PyPDF2 import PdfFileReader
 from tkinter import *
 from tkinter.ttk import *
 from typing import Union, Optional, Dict, Tuple, Any
