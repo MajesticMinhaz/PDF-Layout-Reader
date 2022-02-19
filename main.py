@@ -17,6 +17,7 @@ import ntplib
 from datetime import datetime
 import calendar
 import time
+import requests
 from uttlv import TLV
 import base64
 import qrcode
@@ -818,6 +819,31 @@ def checking_value(
             row=10,
             col=2
         )
+
+
+# Google Drive upload file function
+def upload_google_drive(file_path: str, setting_file_path: str) -> None:
+    setting_data = read_setting_file_func(path=setting_file_path)
+    try:
+        headers = {"Authorization": f"Bearer {setting_data['google_drive_access_token']}"}
+        para = {
+            "name": "setting.env",
+            "parents": [setting_data["google_drive_folder_id"]]
+        }
+        files = {
+            'data': ('metadata', json.dumps(para), 'application/json; charset=UTF-8'),
+            'file': open(file_path, "rb")
+        }
+        r = requests.post(
+            "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+            headers=headers,
+            files=files
+        )
+        messagebox.showinfo('Successfully Uploaded to Google Drive', r.text)
+        log_file(log_message=f"{file_path} Uploaded to Google Drive.", setting_file_path=setting_file_path)
+    except ValueError as e:
+        messagebox.showwarning('Invalid Input', 'Your Google drive access token or Google drive folder ID Invalid.')
+        print(e)
 
 
 if __name__ == "__main__":
