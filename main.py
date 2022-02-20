@@ -849,8 +849,34 @@ def upload_google_drive(file_path: str, setting_file_path: str) -> None:
             )
             messagebox.showinfo('Successfully Uploaded to Google Drive', r.text)
             log_file(log_message=f"{file_path} Uploaded to Google Drive.", setting_file_path=setting_file_path)
-        except ValueError as e:
-            messagebox.showwarning('Invalid Input', 'Your Google drive access token or Google drive folder ID Invalid.')
+        except Exception as e:
+            messagebox.showwarning('Error!', 'Your Google drive access token or Google drive folder ID Invalid.')
+            print(e)
+    else:
+        pass
+
+
+# OneDrive Upload file function.
+def upload_one_drive(file_path: str, setting_file_path: str) -> None:
+    read_file = open(file_path, "rb")
+    file_text = read_file.read()
+    setting_data = read_setting_file_func(path=setting_file_path)
+    one_drive_path = os.path.join(setting_data["one_drive_folder"], os.path.basename(file_path))
+    if setting_data["one_drive_folder"] != "":
+        try:
+            with open(one_drive_path, "wb") as write_file:
+                write_file.write(file_text)
+            log_file(log_message="Successfully Uploaded to OneDrive Folder", setting_file_path=setting_file_path)
+            messagebox.showinfo(
+                title="Successfully Uploaded to OneDrive",
+                message=f"Successfully Uploaded to OneDrive Folder.\nPath: {one_drive_path}"
+            )
+        except Exception as e:
+            messagebox.showerror("Error!", "The OneDrive you specified is not available.")
+            log_file(
+                log_message="App could not save file to OneDrive folder. Because OneDrive Folder is not accessible",
+                setting_file_path=setting_file_path
+            )
             print(e)
     else:
         pass
