@@ -852,6 +852,7 @@ def upload_google_drive(file_path: str, setting_file_path: str) -> None:
             messagebox.showinfo('Successfully Uploaded to Google Drive', r.text)
             log_file(log_message=f"{file_path} Uploaded to Google Drive.", setting_file_path=setting_file_path)
         except Exception as e:
+            log_file(log_message=f"{file_path} couldn't Upload to Google Drive.", setting_file_path=setting_file_path)
             messagebox.showwarning('Error!', 'Your Google drive access token or Google drive folder ID Invalid.')
             print(e)
     else:
