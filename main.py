@@ -446,7 +446,13 @@ def create_setting_file(
         col=0,
         width=16
     )
-    widget.button(text="Log File", command=None, row=16, col=1, width=16)
+    widget.button(
+        text="Log File",
+        command=log_file_user_input,
+        row=16,
+        col=1,
+        width=16
+    )
     widget.button(text=close_window_text, command=setting_screen_window.destroy, row=16, col=2, width=16)
 
 
@@ -558,6 +564,97 @@ def log_file(
         with open(log_file_path, 'w') as write_file:
             write_file.write(write_data)
             write_file.close()
+
+
+# user input for show log file
+def log_file_user_input():
+    user_input_log_file_window = Toplevel(master=root)
+    user_input_log_file_window.resizable(False, False)
+    widget = Widget(master=user_input_log_file_window, frame_text="Input Correct Info :")
+    log_file_path = widget.edit_text(label_text="Log File", row=0)
+    log_file_path.insert(0, "Select your log_info.json file")
+    log_file_path.bind(
+        "<Button-1>", lambda a="Select log_info.json file", b="JSON File", c="log_info.json", d="True": file_select(
+            log_file_path, a, b, c, d
+        )
+    )
+
+    def checking_log_file_user_input() -> None:
+        if is_empty(log_file_path) or field_value(log_file_path) == "Select your log_info.json file":
+            err_message_dialog(field_name="Log file path")
+        else:
+            show_log_file(log_file_path=field_value(log_file_path))
+            user_input_log_file_window.destroy()
+
+    widget.button(text="Submit", command=checking_log_file_user_input, row=1, col=1)
+    widget.button(text="Close Window", command=user_input_log_file_window.destroy, row=1, col=2)
+
+
+# Show Log file:
+def show_log_file(log_file_path: str) -> None:
+    show_log_file_window = Toplevel(master=root)
+    show_log_file_window.resizable(False, False)
+    show_log_file_window.geometry("840x550")
+    widget = Widget(master=show_log_file_window, frame_text="Click any Button to show information :")
+    # second_widget = Widget(master=show_log_file_window, frame_text="Log File's Information :")
+    # widget_canvas = Canvas(widget)
+    # y_scroll_bar = Scrollbar(master=show_log_file_window, orient="vertical")
+    log_file_data = open(log_file_path, "r").read()
+    all_log_info = json.loads(log_file_data)
+    button_row = 0
+
+    def create_button(text: str, row: int, col: int, all_data: str = "") -> Union[Button, Button]:
+        return widget.button(
+            text=text,
+            command=None,
+            row=row,
+            col=col
+        )
+
+    for x in all_log_info:
+        log_data = read_log_file(log_data=x)
+
+        data = f""
+
+        serial_no = all_log_info.index(x) + 1
+        if int(f"{serial_no / 3:.2f}"[-2]) == 3:
+            create_button(
+                text=f"{log_data['date']} {log_data['time']}",
+                row=button_row,
+                col=1,
+            )
+        elif int(f"{serial_no / 3:.2f}"[-2]) == 6:
+            create_button(
+                text=f"{log_data['date']} {log_data['time']}",
+                row=button_row,
+                col=2
+            )
+        else:
+            create_button(
+                text=f"{log_data['date']} {log_data['time']}",
+                row=button_row,
+                col=3
+            )
+            button_row += 1
+
+
+# Read log file
+def read_log_file(log_data: dict) -> dict:
+    key = log_data["key"].encode('utf-8')
+    cipher_code = Fernet(key)
+
+    def decryption_func(key_name: str) -> str:
+        return cipher_code.decrypt(bytes(log_data[key_name], 'utf-8')).decode('utf-8')
+
+    return {
+        "username": decryption_func(key_name="username"),
+        "task": decryption_func(key_name="task"),
+        "company_name": decryption_func(key_name="company_name"),
+        "local_drive_folder_location": decryption_func(key_name="local_drive_folder_loc"),
+        "date": decryption_func(key_name="date"),
+        "time": decryption_func(key_name="time"),
+        "weekday": decryption_func(key_name="weekday")
+    }
 
 
 # Read setting file
