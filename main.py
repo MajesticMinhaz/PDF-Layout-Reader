@@ -862,11 +862,11 @@ def upload_google_drive(file_path: str, setting_file_path: str) -> None:
 
 # OneDrive Upload file function.
 def upload_one_drive(file_path: str, setting_file_path: str) -> None:
-    read_file = open(file_path, "rb")
-    file_text = read_file.read()
     setting_data = read_setting_file_func(path=setting_file_path)
-    one_drive_path = os.path.join(setting_data["one_drive_folder"], os.path.basename(file_path))
     if setting_data["one_drive_folder"] != "":
+        read_file = open(file_path, "rb")
+        file_text = read_file.read()
+        one_drive_path = os.path.join(setting_data["one_drive_folder"], os.path.basename(file_path))
         try:
             with open(one_drive_path, "wb") as write_file:
                 write_file.write(file_text)
@@ -878,7 +878,7 @@ def upload_one_drive(file_path: str, setting_file_path: str) -> None:
         except Exception as e:
             messagebox.showerror("Error!", "The OneDrive you specified is not available.")
             log_file(
-                log_message="App could not save file to OneDrive folder. Because OneDrive Folder is not accessible",
+                log_message=f"{file_path} could not save file to OneDrive. Because OneDrive Folder is not accessible",
                 setting_file_path=setting_file_path
             )
             print(e)
