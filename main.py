@@ -14,6 +14,7 @@ import json
 import re
 import pdftotext
 import ntplib
+import ftplib
 from datetime import datetime
 import calendar
 import time
@@ -884,6 +885,42 @@ def upload_one_drive(file_path: str, setting_file_path: str) -> None:
     else:
         pass
 
+
+# Upload to FTP Server function.
+def upload_ftp_server(file_path: str, setting_file_path: str) -> None:
+    setting_data = read_setting_file_func(path=setting_file_path)
+    if setting_data['ftp_ip'] != "" and setting_data['ftp_username'] != "" and setting_data['ftp_password'] != "":
+        try:
+            session = ftplib.FTP(setting_data['ftp_ip'])
+            if session.login(user=setting_data['ftp_username'], passwd=setting_data['ftp_password']):
+                save_location = os.path.join(setting_data['ftp_folder_location'], os.path.basename(file_path))
+                file_text = open(file_path, "rb")
+                ftp_command = f"STOR {save_location}"
+                session.storbinary(ftp_command, file_text)
+                session.quit()
+                log_file(
+                    log_message=f"{file_path} is successfully uploaded to FTP server",
+                    setting_file_path=setting_file_path
+                )
+                messagebox.showinfo(
+                    title="Successfully Upload!",
+                    message=f"{file_path} is successfully uploaded to FTP server"
+                )
+            else:
+                log_file(
+                    log_message='App can not access to the FTP Server, Because wrong password or username',
+                    setting_file_path=setting_file_path
+                )
+                messagebox.showerror("Wrong Data", "Wrong FTP username of password !")
+        except ValueError as e:
+            log_file(
+                log_message=f"{file_path} could not save file to FTP Server. Because FTP info is not correct.",
+                setting_file_path=setting_file_path
+            )
+            print(e)
+            messagebox.showerror("Error!", "FTP server info is not correct")
+    else:
+        pass
 
 if __name__ == "__main__":
     root = Tk()
