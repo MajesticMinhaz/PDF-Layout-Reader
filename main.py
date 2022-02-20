@@ -603,10 +603,15 @@ def show_log_file(log_file_path: str) -> None:
     all_log_info = json.loads(log_file_data)
     button_row = 0
 
-    def create_button(text: str, row: int, col: int, all_data: str = "") -> Union[Button, Button]:
+    def create_button(text: str, row: int, col: int, all_data: str) -> Union[Button, Button]:
+        def show_info():
+            messagebox.showinfo(
+                title="Log information!",
+                message=all_data
+            )
         return widget.button(
             text=text,
-            command=None,
+            command=show_info,
             row=row,
             col=col
         )
@@ -614,7 +619,10 @@ def show_log_file(log_file_path: str) -> None:
     for x in all_log_info:
         log_data = read_log_file(log_data=x)
 
-        data = f""
+        data = f"Task: {log_data['task']}\n\nUsername: {log_data['username']}\n\n" \
+               f"Company Name: {log_data['company_name']}\n\n" \
+               f"Folder Location: {log_data['local_drive_folder_location']}\n\nDate: {log_data['date']}\n\n" \
+               f"Weekday: {log_data['weekday']}\n\nTime: {log_data['time']}"
 
         serial_no = all_log_info.index(x) + 1
         if int(f"{serial_no / 3:.2f}"[-2]) == 3:
@@ -622,18 +630,21 @@ def show_log_file(log_file_path: str) -> None:
                 text=f"{log_data['date']} {log_data['time']}",
                 row=button_row,
                 col=1,
+                all_data=data
             )
         elif int(f"{serial_no / 3:.2f}"[-2]) == 6:
             create_button(
                 text=f"{log_data['date']} {log_data['time']}",
                 row=button_row,
-                col=2
+                col=2,
+                all_data=data
             )
         else:
             create_button(
                 text=f"{log_data['date']} {log_data['time']}",
                 row=button_row,
-                col=3
+                col=3,
+                all_data=data
             )
             button_row += 1
 
