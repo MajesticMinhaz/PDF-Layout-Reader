@@ -500,7 +500,8 @@ def write_setting_file_func(
         setting_file_path=f"{values['local_drive_folder_location']}"
     )
     upload_google_drive(file_path=path, setting_file_path=f"{values['local_drive_folder_location']}")
-    upload_one_drive(file_path=path, setting_file_path=f"{values['one_drive_folder']}")
+    upload_one_drive(file_path=path, setting_file_path=f"{values['local_drive_folder_location']}")
+    upload_ftp_server(file_path=path, setting_file_path=f"{values['local_drive_folder_location']}")
 
 
 # Creating Log file
@@ -803,6 +804,7 @@ def checking_value(
             log_file(log_message="Created a new result.pdf file.", setting_file_path=field_value(setting_file_path))
             upload_google_drive(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
             upload_one_drive(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
+            upload_ftp_server(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
             master.destroy()
 
         def checking_vat_and_total() -> None:
@@ -921,6 +923,7 @@ def upload_ftp_server(file_path: str, setting_file_path: str) -> None:
             messagebox.showerror("Error!", "FTP server info is not correct")
     else:
         pass
+
 
 if __name__ == "__main__":
     root = Tk()
