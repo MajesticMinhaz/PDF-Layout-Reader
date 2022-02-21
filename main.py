@@ -594,35 +594,48 @@ def log_file_user_input():
 def show_log_file(log_file_path: str) -> None:
     show_log_file_window = Toplevel(master=root)
     show_log_file_window.resizable(False, False)
-    show_log_file_window.geometry("840x550")
-    widget = Widget(master=show_log_file_window, frame_text="Click any Button to show information :")
-    # second_widget = Widget(master=show_log_file_window, frame_text="Log File's Information :")
-    # widget_canvas = Canvas(widget)
-    # y_scroll_bar = Scrollbar(master=show_log_file_window, orient="vertical")
+    show_log_file_window.geometry("860x600")
+    buttons = LabelFrame(
+        master=show_log_file_window,
+        text="Click any Button :",
+        padding=10
+    )
+    information = LabelFrame(
+        master=show_log_file_window,
+        text="Information :",
+        padding=10
+    )
+
+    button_canvas = Canvas(buttons)
+    button_canvas.pack(side=LEFT, fill=BOTH, expand=YES)
+    y_scroll_bar = Scrollbar(master=buttons, orient=VERTICAL, command=button_canvas.yview)
+    y_scroll_bar.pack(side=RIGHT, fill=Y)
+    button_canvas.configure(yscrollcommand=y_scroll_bar.set)
+    button_canvas.bind('<Configure>', lambda e: button_canvas.configure(scrollregion=button_canvas.bbox('all')))
+    my_frame = Frame(button_canvas)
+    button_canvas.create_window((0, 0), window=my_frame, anchor="nw")
+
     log_file_data = open(log_file_path, "r").read()
     all_log_info = json.loads(log_file_data)
     button_row = 0
 
-    def create_button(text: str, row: int, col: int, all_data: str) -> Union[Button, Button]:
-        def show_info():
-            messagebox.showinfo(
-                title="Log information!",
-                message=all_data
-            )
-        return widget.button(
-            text=text,
-            command=show_info,
-            row=row,
-            col=col
-        )
+    log_info_text = Label(master=information, text="Nothing !")
+    log_info_text.grid(row=0, column=0)
+
+    def show_values(output_data: str) -> None:
+        log_info_text.config(text=output_data)
+
+    def create_button(text: str, row: int, col: int, all_data: str) -> None:
+        button = Button(master=my_frame, text=text, padding=5, command=lambda: show_values(all_data), width=30)
+        button.grid(row=row, column=col, padx=5, pady=5)
 
     for x in all_log_info:
         log_data = read_log_file(log_data=x)
 
-        data = f"Task: {log_data['task']}\n\nUsername: {log_data['username']}\n\n" \
-               f"Company Name: {log_data['company_name']}\n\n" \
-               f"Folder Location: {log_data['local_drive_folder_location']}\n\nDate: {log_data['date']}\n\n" \
-               f"Weekday: {log_data['weekday']}\n\nTime: {log_data['time']}"
+        data = f"Task: {log_data['task']}\nUsername: {log_data['username']}\n" \
+               f"Company Name: {log_data['company_name']}\n" \
+               f"Folder Location: {log_data['local_drive_folder_location']}\nDate: {log_data['date']}\n" \
+               f"Weekday: {log_data['weekday']}\nTime: {log_data['time']}"
 
         serial_no = all_log_info.index(x) + 1
         if int(f"{serial_no / 3:.2f}"[-2]) == 3:
@@ -647,6 +660,9 @@ def show_log_file(log_file_path: str) -> None:
                 all_data=data
             )
             button_row += 1
+
+    buttons.pack(fill="both", expand=YES, padx=5, pady=5)
+    information.pack(fill="both", expand=YES, padx=5, pady=5)
 
 
 # Read log file
