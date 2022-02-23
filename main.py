@@ -552,14 +552,12 @@ def log_file(
 
         # text formatting
         final_write_text = f'[{write_text}]'
-        print(final_write_text)
         # write log_info.json file
         with open(log_file_path, 'w') as write_file:
             write_file.write(final_write_text)
             write_file.close()
     else:
         write_data = f'[{json.dumps(data)}]'
-        print(write_data)
         # write log_info.json file
         with open(log_file_path, 'w') as write_file:
             write_file.write(write_data)
@@ -866,7 +864,6 @@ def checking_value(
             qr_text[0x03] = pdf_date.encode('UTF-8')
             qr_text[0x04] = total.encode('UTF-8')
             qr_text[0x05] = vat.encode('UTF-8')
-            print(qr_text)
             qr_text = base64.b64encode(qr_text.to_byte_array())
             qr_code = qrcode.QRCode(
                 version=2,
