@@ -1054,7 +1054,7 @@ if __name__ == "__main__":
     root.title("QR Invoice APP")
     root.resizable(False, False)
     date_rag = re.compile(r"^([0-9]+|[A-Za-z]+)[/. -]([0-9]+|[A-Za-z]+)[/. -]([0-9]+|[A-Za-z]+)$")
-    vat_num_rag = re.compile(r"(^[1]([0-9]{14}$))")
+    vat_num_rag = re.compile(r"(^[3]([0-9]{14}$))")
     pdf_date = None
     pdf_vat_number = None
     hour = None
