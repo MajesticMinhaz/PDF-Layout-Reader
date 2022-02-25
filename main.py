@@ -456,6 +456,8 @@ def write_setting_file_func(
         log_message="Created a new Setting file",
         setting_file_path=f"{values['local_drive_folder_location']}"
     )
+    messagebox.showinfo("Successful !", f"Successfully created setting.env file inside :\n"
+                                        f"{local_drive_folder_location}")
     upload_google_drive(file_path=path, setting_file_path=f"{values['local_drive_folder_location']}")
     upload_one_drive(file_path=path, setting_file_path=f"{values['local_drive_folder_location']}")
     upload_ftp_server(file_path=path, setting_file_path=f"{values['local_drive_folder_location']}")
