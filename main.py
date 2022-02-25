@@ -262,22 +262,17 @@ def create_setting_file(
 ) -> None:
     setting_screen_window = Toplevel(master=root)
     setting_screen_window.resizable(False, False)
-
     widget = Widget(master=setting_screen_window, frame_text=input_valid_information_text)
-
     username = widget.edit_text(label_text="Username", row=0)
-    admin_password = widget.edit_text(label_text="Admin Password", row=1, show="*")
-
-    output_file_name = widget.edit_text(label_text="Filename (*.env)", row=2)
-    output_file_name.insert(0, "setting.env")
-    set_config(field_name=output_file_name, config="disabled")
-
-    company_name = widget.edit_text(label_text="Company Name", row=3)
+    company_name = widget.edit_text(label_text="Company Name", row=1)
+    vat_identifier = widget.edit_text(label_text="VAT Identifier", row=2)
+    vat_identifier.insert(0, "15%|15.0%|VAT|Value|Added|Tax|TAX|vat")
+    total_identifier = widget.edit_text(label_text="Total Identifier", row=3)
+    total_identifier.insert(0, "Total|TOTAL|G.Total|G. Total|total")
     qr_location_x = widget.edit_text(label_text="QR Location X (cm)", row=4)
     qr_location_y = widget.edit_text(label_text="QR Location Y (cm)", row=5)
     qr_size = widget.edit_text(label_text="QR Code Size (cm)", row=6)
-
-    # ----------------------------- Only for Local drive folder location -------------------------------
+    qr_size.insert(0, "3")
     local_drive_folder_location = widget.edit_text(label_text="Local Drive Folder Location", row=7)
     local_drive_folder_location.insert(0, "Select a file")
     local_drive_folder_location.bind(
