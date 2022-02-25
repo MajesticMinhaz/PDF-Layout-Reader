@@ -381,26 +381,12 @@ def create_setting_file(
                 "ftp_folder_location": field_value(ftp_folder_location)
             }
 
-            messagebox.showinfo("Successful !", f"Successfully created setting.env file inside :\n"
-                                                f"{field_value(local_drive_folder_location)}")
-
             # Deleting all value from current screen
-            delete_field_value(username)
-            delete_field_value(admin_password)
-            delete_field_value(company_name)
-            delete_field_value(qr_location_x)
-            delete_field_value(qr_location_y)
-            delete_field_value(qr_size)
-            delete_field_value(local_drive_folder_location)
-            delete_field_value(google_drive_access_token)
-            delete_field_value(google_drive_folder_id)
-            delete_field_value(one_drive_folder)
-            delete_field_value(ftp_ip)
-            delete_field_value(ftp_username)
-            delete_field_value(ftp_password)
-            delete_field_value(ftp_folder_location)
+            for delete_field in all_fields:
+                delete_field_value(delete_field)
 
             write_setting_file_func(values=user_input)
+            setting_screen_window.destroy()
 
     widget.button(
         text=submit_text,
