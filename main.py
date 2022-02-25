@@ -436,8 +436,9 @@ def write_setting_file_func(
     ftp_folder_location = encryption_func(key_name="ftp_folder_location")
 
     # Creating File template here
-    template = f"KEY={key}\nADMIN_USERNAME={username}\nPASSWORD={admin_password}\nFILE_NAME={setting_file_name}\n" \
-               f"COMPANY_NAME={company_name}\nQR_LOC_X={qr_location_x}\nQR_LOC_Y={qr_location_y}\nQR_SIZE={qr_size}\n" \
+    template = f"RANDOM={key}\nADMIN_USERNAME={username}\nFILE_NAME={setting_file_name}\n" \
+               f"VAT_IDENTIFIER={vat_identifier}\nTOTAL_IDENTIFIER={total_identifier}\nCOMPANY_NAME={company_name}\n" \
+               f"QR_LOC_X={qr_location_x}\nQR_LOC_Y={qr_location_y}\nQR_SIZE={qr_size}\n" \
                f"LOCAL_FILE_LOC={local_drive_folder_location}\nGOOGLE_DRIVE_TOKEN={google_drive_access_token}\n" \
                f"GOOGLE_DRIVE_FOLDER_ID={google_drive_folder_id}\nONE_DRIVE_FOLDER={one_drive_folder}\n" \
                f"FTP_IP={ftp_ip}\nFTP_USERNAME={ftp_username}\nFTP_PASSWORD={ftp_password}\n" \
@@ -478,7 +479,7 @@ def log_file(
         return cipher_code.encrypt(setting_file_data[key_name].encode('utf-8')).decode('utf-8')
 
     data = {
-        "key": key.decode("utf-8"),
+        "random": key.decode("utf-8"),
         "username": dict_value_encryption_text_func("username"),
         "task": cipher_code.encrypt(log_message.encode('utf-8')).decode('utf-8'),
         "company_name": dict_value_encryption_text_func("company_name"),
@@ -639,7 +640,7 @@ def read_setting_file_func(
     setting_file_absolute_path = os.path.join(path, "setting.env")
     try:
         load_dotenv(setting_file_absolute_path)
-        key = os.getenv('KEY').encode('utf-8')
+        key = os.getenv('RANDOM').encode('utf-8')
         cipher_code = Fernet(key)
 
         # decryption shortcut function
