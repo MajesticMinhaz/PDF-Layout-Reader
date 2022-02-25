@@ -280,88 +280,57 @@ def create_setting_file(
             local_drive_folder_location, a, b, c, d
         )
     )
-
-    # -------------------------------------------------------------------------------------------------
-    # ------------------------------------Checkbutton here start-------------------------------------
-
     google_drive_check_btn_status = IntVar()
     widget.check_button(
-        check_button_text="Google Drive Folder",
-        variable_name=google_drive_check_btn_status,
+        check_button_text="Google Drive Folder", variable_name=google_drive_check_btn_status,
         command=lambda: check_button_function(
             google_drive_check_btn_status,
             google_drive_access_token,
             google_drive_folder_id
-        ),
-        row=8,
-        col=0
+        ), row=8, col=0
     )
-
-    # ---------------------------------- Google Drive Checkbutton end here----------------------------------------
-
-    # ---------------------------------- OneDrive Checkbutton here start------------------------------------------
-
     one_drive_folder_check_btn_status = IntVar()
     widget.check_button(
-        check_button_text="OneDrive Folder",
-        variable_name=one_drive_folder_check_btn_status,
+        check_button_text="OneDrive Folder", variable_name=one_drive_folder_check_btn_status,
         command=lambda: check_button_function(
             one_drive_folder_check_btn_status,
             one_drive_folder
-        ),
-        row=8,
-        col=1
+        ), row=8, col=1
     )
-
-    # ---------------------------------- OneDrive Checkbutton end here------------------------------------------
-
-    # ---------------------------------- FTP server Checkbutton here start------------------------------------------
-
     ftp_server_check_btn_status = IntVar()
     widget.check_button(
-        check_button_text="FTP Server",
-        variable_name=ftp_server_check_btn_status,
+        check_button_text="FTP Server", variable_name=ftp_server_check_btn_status,
         command=lambda: check_button_function(
             ftp_server_check_btn_status,
             ftp_ip,
             ftp_username,
             ftp_password,
             ftp_folder_location
-        ),
-        row=8,
-        col=2
+        ), row=8, col=2
     )
-    # ----------------------------------FTP Server Checkbutton here end------------------------------------------
-    # ----------------------------------Checkbutton here end------------------------------------------
-
     google_drive_access_token = widget.edit_text(label_text="Access Token", row=9)
     google_drive_folder_id = widget.edit_text(label_text="Google Drive Folder ID", row=10)
-
     one_drive_folder = widget.edit_text(label_text="OneDrive Folder", row=11)
-
     ftp_ip = widget.edit_text(label_text="FTP IP", row=12)
     ftp_username = widget.edit_text(label_text="FTP Username", row=13)
     ftp_password = widget.edit_text(label_text="FTP Password", row=14, show="*")
     ftp_folder_location = widget.edit_text(label_text="FTP Folder Location", row=15)
-
-    # -------------------------------------------------------------------------------------------------
+    all_fields = [username, company_name, vat_identifier, total_identifier, qr_location_x, qr_location_y, qr_size,
+                  local_drive_folder_location, google_drive_access_token, google_drive_folder_id, one_drive_folder,
+                  ftp_ip, ftp_username, ftp_password, ftp_folder_location]
     # disable all additional fields without local drive field
-    set_config(field_name=google_drive_access_token, config="disabled")
-    set_config(field_name=google_drive_folder_id, config="disabled")
-    set_config(field_name=one_drive_folder, config="disabled")
-    set_config(field_name=ftp_ip, config="disabled")
-    set_config(field_name=ftp_username, config="disabled")
-    set_config(field_name=ftp_password, config="disabled")
-    set_config(field_name=ftp_folder_location, config="disabled")
+    for field in all_fields[8:]:
+        set_config(field_name=field, config="disabled")
 
-    # -------------------------------------------------------------------------------------------------
     def checking_input_validity() -> None:
         if is_empty(username):
             err_message_dialog("Username")
-        elif is_empty(admin_password):
-            err_message_dialog('Admin Password')
         elif is_empty(company_name):
             err_message_dialog('Company Name')
+        elif is_empty(vat_identifier):
+            err_message_dialog("VAT Identifier")
+        elif is_empty(total_identifier):
+            err_message_dialog("Total Identifier")
         elif is_empty(qr_location_x):
             err_message_dialog("QR Code Location X (cm)")
         elif is_empty(qr_location_y):
@@ -385,9 +354,7 @@ def create_setting_file(
         elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_folder_location):
             err_message_dialog("FTP Folder Location")
         elif field_value(username) != "root2020":
-            err_message_dialog("Username", False)
-        elif field_value(admin_password) != "12345678":
-            err_message_dialog("Admin Password", False)
+            err_message_dialog("Username")
         elif not field_value(qr_location_x).isdigit():
             err_message_dialog("QR Code Location X (cm)", False)
         elif not field_value(qr_location_y).isdigit():
@@ -397,8 +364,9 @@ def create_setting_file(
         else:
             user_input = {
                 "username": field_value(username),
-                "password": field_value(admin_password),
-                "setting_file_name": field_value(output_file_name),
+                "setting_file_name": "setting.env",
+                "vat_identifier": field_value(vat_identifier),
+                "total_identifier": field_value(total_identifier),
                 "company_name": field_value(company_name),
                 "qr_location_x": field_value(qr_location_x),
                 "qr_location_y": field_value(qr_location_y),
@@ -465,9 +433,10 @@ def write_setting_file_func(
     # Getting all values from user input
     key = key.decode('utf-8')
     username = encryption_func(key_name="username")
-    admin_password = encryption_func(key_name="password")
     setting_file_name = encryption_func(key_name="setting_file_name")
     company_name = encryption_func(key_name="company_name")
+    vat_identifier = encryption_func(key_name="vat_identifier")
+    total_identifier = encryption_func(key_name="total_identifier")
     qr_location_x = encryption_func(key_name="qr_location_x")
     qr_location_y = encryption_func(key_name="qr_location_y")
     qr_size = encryption_func(key_name="qr_size")
@@ -695,9 +664,10 @@ def read_setting_file_func(
             data = {
                 "key": key.decode('utf-8'),
                 "username": decryption_func(key_name='ADMIN_USERNAME'),
-                "admin_password": decryption_func(key_name='PASSWORD'),
                 "file_name": decryption_func(key_name='FILE_NAME'),
                 "company_name": decryption_func(key_name='COMPANY_NAME'),
+                "vat_identifier": decryption_func(key_name='VAT_IDENTIFIER'),
+                "total_identifier": decryption_func(key_name='TOTAL_IDENTIFIER'),
                 "qr_loc_x": decryption_func(key_name='QR_LOC_X'),
                 "qr_loc_y": decryption_func(key_name='QR_LOC_Y'),
                 "qr_size": decryption_func(key_name='QR_SIZE'),
@@ -773,7 +743,7 @@ def checking_value(
         next_button: Union[Button, Button],
         close_button: Union[Button, Button]
 ) -> None:
-    global pdf_date, pdf_vat_number, hour, minute, second, year, day, month
+    global pdf_date, pdf_vat_number, hour, minute, second, year, day, month, total_amount, vat_amount
     if is_empty(setting_file_path):
         err_message_dialog(field_name="setting file's path")
     elif is_empty(pdf_file_path):
@@ -783,6 +753,7 @@ def checking_value(
         set_config(field_name=pdf_file_path, config="disabled")
         next_button.destroy()
         close_button.destroy()
+        setting_data = read_setting_file_func(path=field_value(setting_file_path))
         # Read PDF file
         with open(field_value(pdf_file_path), 'rb') as read_pdf:
             pdf_page_obj = pdftotext.PDF(pdf_file=read_pdf)
@@ -792,9 +763,31 @@ def checking_value(
             # get date and vat number from pdf file
             pdf_date = list(filter(lambda item: date_rag.match(item), pdf_page_text_list))[0]
             pdf_vat_number = list(filter(lambda item: vat_num_rag.match(item), pdf_page_text_list))[0]
-        except ValueError as e:
+        except IndexError as e:
             print('Some value is missing in pdf file.', e)
             messagebox.showerror('Invalid Format', 'Your pdf file is Invalid Format.')
+
+        try:
+            vat_identifier_flag = False
+            total_identifier_flag = False
+            for x in pdf_page_text_list:
+                if re.search(setting_data['vat_identifier'], x):
+                    vat_identifier_flag = True
+                elif re.search(setting_data['total_identifier'], x):
+                    total_identifier_flag = True
+                elif vat_identifier_flag:
+                    if re.search(r"(\d+,)?\d+\.\d+", x):
+                        vat_amount = re.search(r"(\d+,)?\d+\.\d+", x).group()
+                        vat_identifier_flag = False
+                    else:
+                        continue
+                elif total_identifier_flag:
+                    if re.search(r"(\d+,)?\d+\.\d+", x):
+                        total_amount = re.search(r"(\d+,)?\d+\.\d+", x).group()
+                    else:
+                        continue
+        except IndexError as e:
+            print(e)
 
         try:
             ntp_client = ntplib.NTPClient()
@@ -842,17 +835,14 @@ def checking_value(
         else:
             pdf_date = date_time.strftime(f'%Y-%m-%d {hour}:{minute}:{second}')
 
-        setting_data = read_setting_file_func(path=field_value(setting_file_path))
-
         widget.label(label_text=f"Company Name: {setting_data['company_name']}", row=2, col=1)
         widget.label(label_text=f"Date: {pdf_date}", row=3, col=1)
         widget.label(label_text=f"VAT Number : {pdf_vat_number}", row=4, col=1)
         widget.label(label_text=f"QR Location X (cm): {setting_data['qr_loc_x']}", row=5, col=1)
         widget.label(label_text=f"QR Location Y (cm): {setting_data['qr_loc_y']}", row=6, col=1)
         widget.label(label_text=f"QR Code Size (cm): {setting_data['qr_size']}", row=7, col=1)
-
-        vat_amount = widget.edit_text(label_text="VAT", row=8)
-        total_amount = widget.edit_text(label_text="Total", row=9)
+        widget.label(label_text=f"Total: {total_amount}", row=8, col=1)
+        widget.label(label_text=f"VAT: {vat_amount}", row=9, col=1)
 
         # Prepare QR Code
         def prepare_result_file() -> None:
@@ -861,8 +851,8 @@ def checking_value(
             qr_text[0x01] = setting_data["company_name"].encode('UTF-8')
             qr_text[0x02] = pdf_vat_number.encode('UTF-8')
             qr_text[0x03] = pdf_date.encode('UTF-8')
-            qr_text[0x04] = total.encode('UTF-8')
-            qr_text[0x05] = vat.encode('UTF-8')
+            qr_text[0x04] = total_amount.encode('UTF-8')
+            qr_text[0x05] = vat_amount.encode('UTF-8')
             qr_text = base64.b64encode(qr_text.to_byte_array())
             qr_code = qrcode.QRCode(
                 version=2,
@@ -1053,6 +1043,8 @@ if __name__ == "__main__":
     vat_num_rag = re.compile(r"(^[3]([0-9]{14}$))")
     pdf_date = None
     pdf_vat_number = None
+    total_amount = None
+    vat_amount = None
     hour = None
     minute = None
     second = None
