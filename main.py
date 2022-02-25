@@ -826,8 +826,11 @@ def checking_value(
         date_time = datetime.now()
         if pdf_date is not None:
             date_data = pdf_date.split(re.findall(r'[./-]', pdf_date)[0])
-
-            year = list(filter(lambda a: re.search(r'[0-9]{4}', a), date_data))[0]
+            try:
+                year = list(filter(lambda a: re.search(r'[0-9]{4}', a), date_data))[0]
+            except IndexError as e:
+                year = f"20{list(filter(lambda a: re.search(r'[0-9]{2}', a), date_data))[2]}"
+                print(e)
             day = date_data[0]
 
             try:
@@ -837,8 +840,9 @@ def checking_value(
                     list(filter(lambda a: re.findall(a.lower(), lower_date), month_list[1:]))[0]
                 ))
                 month_index = check_digit(month_index)
-            except ValueError:
+            except IndexError as e:
                 month_index = date_data[1]
+                print(e)
             pdf_date = f'{year}-{month_index}-{day} {hour}:{minute}:{second}'
         else:
             pdf_date = date_time.strftime(f'%Y-%m-%d {hour}:{minute}:{second}')
