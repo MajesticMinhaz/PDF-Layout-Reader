@@ -906,20 +906,9 @@ def checking_value(
             upload_ftp_server(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
             master.destroy()
 
-        def checking_vat_and_total() -> None:
-            global vat, total
-            if is_empty(vat_amount):
-                err_message_dialog(field_name="VAT")
-            elif is_empty(total_amount):
-                err_message_dialog(field_name="Total")
-            else:
-                vat = field_value(vat_amount)
-                total = field_value(total_amount)
-                prepare_result_file()
-
         widget.button(
             text="Submit",
-            command=checking_vat_and_total,
+            command=prepare_result_file,
             row=10,
             col=1
         )
