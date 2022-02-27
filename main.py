@@ -884,11 +884,11 @@ def checking_value(
         widget.label(label_text=f"Company Name: {setting_data['company_name']}", row=2, col=1)
         widget.label(label_text=f"Date: {pdf_date}", row=3, col=1)
         widget.label(label_text=f"VAT Number : {pdf_vat_number}", row=4, col=1)
-        widget.label(label_text=f"QR Location X (cm): {setting_data['qr_loc_x']}", row=5, col=1)
-        widget.label(label_text=f"QR Location Y (cm): {setting_data['qr_loc_y']}", row=6, col=1)
-        widget.label(label_text=f"QR Code Size (cm): {setting_data['qr_size']}", row=7, col=1)
-        widget.label(label_text=f"Total: {total_amount}", row=8, col=1)
-        widget.label(label_text=f"VAT: {vat_amount}", row=9, col=1)
+        widget.label(label_text=f"Total: {total_amount}", row=5, col=1)
+        widget.label(label_text=f"VAT: {vat_amount}", row=6, col=1)
+        widget.label(label_text=f"QR Location X (cm): {setting_data['qr_loc_x']}", row=7, col=1)
+        widget.label(label_text=f"QR Location Y (cm): {setting_data['qr_loc_y']}", row=8, col=1)
+        widget.label(label_text=f"QR Code Size (cm): {setting_data['qr_size']}", row=9, col=1)
 
         # Prepare QR Code
         def prepare_result_file() -> None:
