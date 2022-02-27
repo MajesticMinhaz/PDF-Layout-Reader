@@ -492,30 +492,56 @@ def write_setting_file_func(
 # Creating Log file
 def log_file(
         log_message: str,
-        setting_file_path: str
+        setting_file: bool = True,
+        setting_file_path: str = None,
 ) -> None:
-    setting_file_data = read_setting_file_func(path=setting_file_path)
-    log_file_path = os.path.join(setting_file_path, "log_info.json")
-    key = setting_file_data["key"].encode('utf-8')
-    cipher_code = Fernet(key)
+    data = None
+    cipher_code = None
     date_time = datetime.now()
+    log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log_info.json")
 
     def date_time_encryption_text_func(key_name: str) -> str:
         return cipher_code.encrypt(date_time.strftime(key_name).encode('utf-8')).decode('utf-8')
 
-    def dict_value_encryption_text_func(key_name: str) -> str:
-        return cipher_code.encrypt(setting_file_data[key_name].encode('utf-8')).decode('utf-8')
+    if setting_file:
+        if setting_file_path is not None:
+            setting_file_data = read_setting_file_func(path=setting_file_path)
+            key = setting_file_data["key"].encode('utf-8')
+            cipher_code = Fernet(key)
 
-    data = {
-        "random": key.decode("utf-8"),
-        "username": dict_value_encryption_text_func("username"),
-        "task": cipher_code.encrypt(log_message.encode('utf-8')).decode('utf-8'),
-        "company_name": dict_value_encryption_text_func("company_name"),
-        "local_drive_folder_loc": dict_value_encryption_text_func("local_drive_folder_location"),
-        "date": date_time_encryption_text_func(key_name="%d %B, %Y"),
-        "weekday": date_time_encryption_text_func(key_name="%A"),
-        "time": date_time_encryption_text_func(key_name="%I:%M:%S %p")
-    }
+            def dict_value_encryption_text_func(key_name: str) -> str:
+                return cipher_code.encrypt(setting_file_data[key_name].encode('utf-8')).decode('utf-8')
+
+            data = {
+                "random": key.decode("utf-8"),
+                "username": dict_value_encryption_text_func("username"),
+                "task": cipher_code.encrypt(log_message.encode('utf-8')).decode('utf-8'),
+                "company_name": dict_value_encryption_text_func("company_name"),
+                "local_drive_folder_loc": dict_value_encryption_text_func("local_drive_folder_location"),
+                "date": date_time_encryption_text_func(key_name="%d %B, %Y"),
+                "weekday": date_time_encryption_text_func(key_name="%A"),
+                "time": date_time_encryption_text_func(key_name="%I:%M:%S %p")
+            }
+        else:
+            print("Enter yor setting file path for create a log item.")
+    else:
+        # creating key
+        key = Fernet.generate_key()
+        cipher_code = Fernet(key)
+
+        def encryption_func(key_name: str) -> str:
+            return cipher_code.encrypt(key_name.encode('utf-8')).decode('utf-8')
+
+        data = {
+            "random": key.decode("utf-8"),
+            "username": encryption_func("Anonymous username"),
+            "task": encryption_func(log_message),
+            "company_name": encryption_func("Anonymous company name"),
+            "local_drive_folder_location": encryption_func("Local Drive Folder Location Not Found !"),
+            "date": date_time_encryption_text_func(key_name="%d %B, %Y"),
+            "weekday": date_time_encryption_text_func(key_name="%A"),
+            "time": date_time_encryption_text_func(key_name="%I:%M:%S %p")
+        }
 
     if os.path.isfile(log_file_path):
         with open(log_file_path, 'r') as read_file:
