@@ -680,9 +680,10 @@ def read_log_file(log_data: dict) -> dict:
             "local_drive_folder_location": decryption_func(key_name="local_drive_folder_location"),
             "date": decryption_func(key_name="date"),
             "time": decryption_func(key_name="time"),
+
             "weekday": decryption_func(key_name="weekday")
         }
-    except KeyError as e:
+    except TypeError as e:
         log_file(f"Tried to open a wrong log file using this application.\nError : {e}", False)
         messagebox.showwarning("Invalid Log file", "Your Log file is Invalid.")
 
@@ -722,11 +723,13 @@ def read_setting_file_func(
                 "ftp_folder_location": decryption_func(key_name='FTP_FOLDER_LOC')
             }
             return data
-        except Exception as e:
+        except KeyError as e:
+            log_file("Tried to processed using an invalid setting file.", False)
             messagebox.showerror("Value Not Found !", "Some value is missing in your setting file.")
             print(e)
             return {}
-    except ValueError as e:
+    except TypeError as e:
+        log_file("Tried to processed using an invalid setting file.", False)
         messagebox.showerror("Value Not Found !", "Some Values not found in this setting file.\n"
                                                   "Please Create a new one.")
         print(f"Value Not Found !\n{e}")
