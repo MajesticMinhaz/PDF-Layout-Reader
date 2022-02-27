@@ -462,8 +462,8 @@ def write_setting_file_func(
     ftp_folder_location = encryption_func(key_name="ftp_folder_location")
 
     # Creating File template here
-    template = f"RANDOM={key}\nADMIN_USERNAME={username}\nFILE_NAME={setting_file_name}\n" \
-               f"VAT_IDENTIFIER={vat_identifier}\nTOTAL_IDENTIFIER={total_identifier}\nCOMPANY_NAME={company_name}\n" \
+    template = f"ADMIN_USERNAME={username}\nFILE_NAME={setting_file_name}\nVAT_IDENTIFIER={vat_identifier}\n" \
+               f"TOTAL_IDENTIFIER={total_identifier}\nCOMPANY_NAME={company_name}\nRANDOM={key}\n" \
                f"QR_LOC_X={qr_location_x}\nQR_LOC_Y={qr_location_y}\nQR_SIZE={qr_size}\n" \
                f"LOCAL_FILE_LOC={local_drive_folder_location}\nGOOGLE_DRIVE_TOKEN={google_drive_access_token}\n" \
                f"GOOGLE_DRIVE_FOLDER_ID={google_drive_folder_id}\nONE_DRIVE_FOLDER={one_drive_folder}\n" \
