@@ -955,7 +955,7 @@ def checking_value(
             os.remove(qr_code_pdf_file_path)
             messagebox.showinfo(
                 title="Successfully created !",
-                message=f"Successfully Created result.pdf file !\nPath: {output_file_name}"
+                message=f"Successfully Created a statement file !\nPath: {output_file_name}"
             )
             log_file(
                 log_message=f"Successfully created a new statement {output_file_name} file.",
