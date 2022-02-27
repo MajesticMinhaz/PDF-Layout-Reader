@@ -600,16 +600,9 @@ def show_log_file(log_file_path: str) -> None:
     show_log_file_window = Toplevel(master=root)
     show_log_file_window.resizable(False, False)
     show_log_file_window.geometry("860x600")
-    buttons = LabelFrame(
-        master=show_log_file_window,
-        text="Click any Button :",
-        padding=10
-    )
-    information = LabelFrame(
-        master=show_log_file_window,
-        text="Information :",
-        padding=10
-    )
+
+    buttons = LabelFrame(master=show_log_file_window, text="Click any Button :", padding=10)
+    information = LabelFrame(master=show_log_file_window, text="Information :", padding=10)
 
     button_canvas = Canvas(buttons)
     button_canvas.pack(side=LEFT, fill=BOTH, expand=YES)
@@ -638,9 +631,9 @@ def show_log_file(log_file_path: str) -> None:
         log_data = read_log_file(log_data=x)
 
         data = f"Task: {log_data['task']}\nUsername: {log_data['username']}\n" \
-               f"Company Name: {log_data['company_name']}\n" \
-               f"Folder Location: {log_data['local_drive_folder_location']}\nDate: {log_data['date']}\n" \
-               f"Weekday: {log_data['weekday']}\nTime: {log_data['time']}"
+            f"Company Name: {log_data['company_name']}\n" \
+            f"Folder Location: {log_data['local_drive_folder_location']}\nDate: {log_data['date']}\n" \
+            f"Weekday: {log_data['weekday']}\nTime: {log_data['time']}"
 
         serial_no = all_log_info.index(x) + 1
         if int(f"{serial_no / 3:.2f}"[-2]) == 3:
@@ -668,25 +661,30 @@ def show_log_file(log_file_path: str) -> None:
 
     buttons.pack(fill="both", expand=YES, padx=5, pady=5)
     information.pack(fill="both", expand=YES, padx=5, pady=5)
+    log_file("Successfully displayed all log information", False)
 
 
 # Read log file
 def read_log_file(log_data: dict) -> dict:
-    key = log_data["key"].encode('utf-8')
-    cipher_code = Fernet(key)
+    try:
+        key = log_data["random"].encode('utf-8')
+        cipher_code = Fernet(key)
 
-    def decryption_func(key_name: str) -> str:
-        return cipher_code.decrypt(bytes(log_data[key_name], 'utf-8')).decode('utf-8')
+        def decryption_func(key_name: str) -> str:
+            return cipher_code.decrypt(bytes(log_data[key_name], 'utf-8')).decode('utf-8')
 
-    return {
-        "username": decryption_func(key_name="username"),
-        "task": decryption_func(key_name="task"),
-        "company_name": decryption_func(key_name="company_name"),
-        "local_drive_folder_location": decryption_func(key_name="local_drive_folder_loc"),
-        "date": decryption_func(key_name="date"),
-        "time": decryption_func(key_name="time"),
-        "weekday": decryption_func(key_name="weekday")
-    }
+        return {
+            "username": decryption_func(key_name="username"),
+            "task": decryption_func(key_name="task"),
+            "company_name": decryption_func(key_name="company_name"),
+            "local_drive_folder_location": decryption_func(key_name="local_drive_folder_location"),
+            "date": decryption_func(key_name="date"),
+            "time": decryption_func(key_name="time"),
+            "weekday": decryption_func(key_name="weekday")
+        }
+    except KeyError as e:
+        log_file(f"Tried to open a wrong log file using this application.\nError : {e}", False)
+        messagebox.showwarning("Invalid Log file", "Your Log file is Invalid.")
 
 
 # Read setting file
