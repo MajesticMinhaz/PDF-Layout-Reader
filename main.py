@@ -201,7 +201,9 @@ def functional_screen(
 
     if language == "Arabic":
         functional_screen_ui(enter_admin_password_text='أدخل كلمة مرور المسؤول :', submit_text='إرسال')
+        log_file("Arabic language has been selected for processing", False)
     else:
+        log_file("English language has been selected for processing", False)
         functional_screen_ui(enter_admin_password_text="Enter Admin Password", submit_text="Submit")
 
 
@@ -222,14 +224,18 @@ def admin_login_screen(
     def checking_password(passwd: Entry):
         if is_empty(passwd):
             text.config(text="Password can\'t be empty")
+            log_file("Attempted to proceed with blank password", False)
             delete_field_value(passwd)
         elif len(field_value(passwd)) < 8:
             text.config(text="Length of Password should be at least 8")
+            log_file("Attempted to proceed with password less than 8 characters", False)
             delete_field_value(passwd)
         elif len(field_value(passwd)) == 8 and field_value(passwd) != "12345678":
             text.config(text="Wrong Password ! Try Again !")
+            log_file("Attempted to proceed with incorrect password", False)
             delete_field_value(passwd)
         elif len(field_value(passwd)) == 8 and field_value(passwd) == "12345678":
+            log_file("Password authentication completed successfully", False)
             text.config(text="Successfully logged in.")
             delete_field_value(passwd)
             admin_login_screen_window.destroy()
@@ -247,8 +253,9 @@ def admin_login_screen(
                     close_window_text=close_window_text
                 )
         else:
-            widget.label(label_text="Something went wrong ! Try Again", row=1, col=1)
-            passwd.delete(0, 'end')
+            text.config(text="Something went wrong ! Try Again")
+            log_file("Tried to enter an invalid password or something else.", False)
+            delete_field_value(passwd)
 
     widget.button(text=submit_text, command=lambda: checking_password(user_password), row=2, col=0, width=15)
     widget.button(text=close_window_text, command=admin_login_screen_window.destroy, row=2, col=2, width=15)
@@ -324,42 +331,61 @@ def create_setting_file(
 
     def checking_input_validity() -> None:
         if is_empty(username):
+            log_file("Attempted to create setting file with empty username", False)
             err_message_dialog("Username")
         elif is_empty(company_name):
+            log_file("Attempted to create setting file with empty company name", False)
             err_message_dialog('Company Name')
         elif is_empty(vat_identifier):
+            log_file("Attempted to create setting file with empty VAT identifier", False)
             err_message_dialog("VAT Identifier")
         elif is_empty(total_identifier):
+            log_file("Attempted to create setting file with empty Total identifier", False)
             err_message_dialog("Total Identifier")
         elif is_empty(qr_location_x):
+            log_file("Attempted to create setting file with empty QR code location X", False)
             err_message_dialog("QR Code Location X (cm)")
         elif is_empty(qr_location_y):
+            log_file("Attempted to create setting file with empty QR code location Y", False)
             err_message_dialog("QR Code Location Y (cm)")
         elif is_empty(qr_size):
+            log_file("Attempted to create setting file with empty QR code size", False)
             err_message_dialog("QR code box size (cm)")
         elif is_empty(local_drive_folder_location) or field_value(local_drive_folder_location) == 'Select a file':
+            log_file("Attempted to create setting file with empty Local Drive Folder Location", False)
             err_message_dialog("Local Drive Folder Location")
         elif check_btn_status(google_drive_check_btn_status) == 1 and is_empty(google_drive_access_token):
+            log_file("Attempted to create setting file with empty Google Drive Access Token", False)
             err_message_dialog("Google Drive Access Token")
         elif check_btn_status(google_drive_check_btn_status) == 1 and is_empty(google_drive_folder_id):
+            log_file("Attempted to create setting file with empty Google Drive Folder ID", False)
             err_message_dialog("Google Drive Folder ID")
         elif check_btn_status(one_drive_folder_check_btn_status) == 1 and is_empty(one_drive_folder):
+            log_file("Attempted to create setting file with empty OneDrive Folder", False)
             err_message_dialog("OneDrive Folder")
         elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_ip):
+            log_file("Attempted to create setting file with empty FTP IP", False)
             err_message_dialog("FTP IP")
         elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_username):
+            log_file("Attempted to create setting file with empty FTP Username", False)
             err_message_dialog("FTP Username")
         elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_password):
+            log_file("Attempted to create setting file with empty FTP Password", False)
             err_message_dialog("FTP Password")
         elif check_btn_status(ftp_server_check_btn_status) == 1 and is_empty(ftp_folder_location):
+            log_file("Attempted to create setting file with empty FTP Folder Location", False)
             err_message_dialog("FTP Folder Location")
         elif field_value(username) != "root2020":
+            log_file("Attempted to create setting file with incorrect username", False)
             err_message_dialog("Username")
         elif not field_value(qr_location_x).isdigit():
+            log_file("Attempted to create setting file with invalid QR code location X (cm).", False)
             err_message_dialog("QR Code Location X (cm)", False)
         elif not field_value(qr_location_y).isdigit():
+            log_file("Attempted to create setting file with invalid QR code location Y (cm).", False)
             err_message_dialog("QR Code Location Y (cm)", False)
         elif not field_value(qr_size).isdigit():
+            log_file("Attempted to create setting file with invalid QR code size (cm).", False)
             err_message_dialog("QR Code Size (cm)", False)
         else:
             user_input = {
@@ -453,7 +479,7 @@ def write_setting_file_func(
         write.close()
 
     log_file(
-        log_message="Created a new Setting file",
+        log_message=f"Successfully Created a new Setting file. File Location : {values['local_drive_folder_location']}",
         setting_file_path=f"{values['local_drive_folder_location']}"
     )
     messagebox.showinfo("Successful !", f"Successfully created setting.env file inside :\n"
@@ -532,8 +558,10 @@ def log_file_user_input():
 
     def checking_log_file_user_input() -> None:
         if is_empty(log_file_path) or field_value(log_file_path) == "Select your log_info.json file":
+            log_file("Attempted to show log file with empty log file path field.", False)
             err_message_dialog(field_name="Log file path")
         else:
+            log_file(f"Entered a valid log file path. Path : {field_value(log_file_path)}", False)
             show_log_file(log_file_path=field_value(log_file_path))
             user_input_log_file_window.destroy()
 
@@ -570,7 +598,7 @@ def show_log_file(log_file_path: str) -> None:
     all_log_info = json.loads(log_file_data)
     button_row = 0
 
-    log_info_text = Label(master=information, text="Nothing !")
+    log_info_text = Label(master=information, text="Nothing to show!")
     log_info_text.grid(row=0, column=0)
 
     def show_values(output_data: str) -> None:
@@ -734,8 +762,10 @@ def checking_value(
 ) -> None:
     global pdf_date, pdf_vat_number, hour, minute, second, year, day, month, total_amount, vat_amount
     if is_empty(setting_file_path):
+        log_file("Attempted to create statement pdf file with empty setting file.", False)
         err_message_dialog(field_name="setting file's path")
     elif is_empty(pdf_file_path):
+        log_file("Attempted to create statement pdf file with empty pdf file.", False)
         err_message_dialog(field_name="PDF file's path")
     else:
         set_config(field_name=setting_file_path, config="disabled")
@@ -900,7 +930,10 @@ def checking_value(
                 title="Successfully created !",
                 message=f"Successfully Created result.pdf file !\nPath: {output_file_name}"
             )
-            log_file(log_message="Created a new result.pdf file.", setting_file_path=field_value(setting_file_path))
+            log_file(
+                log_message=f"Successfully created a new statement {output_file_name} file.",
+                setting_file_path=field_value(setting_file_path)
+            )
             upload_google_drive(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
             upload_one_drive(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
             upload_ftp_server(file_path=output_file_name, setting_file_path=field_value(setting_file_path))
