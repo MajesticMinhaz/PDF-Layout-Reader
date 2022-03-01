@@ -631,9 +631,9 @@ def show_log_file(log_file_path: str) -> None:
         log_data = read_log_file(log_data=x)
 
         data = f"Task: {log_data['task']}\nUsername: {log_data['username']}\n" \
-            f"Company Name: {log_data['company_name']}\n" \
-            f"Folder Location: {log_data['local_drive_folder_location']}\nDate: {log_data['date']}\n" \
-            f"Weekday: {log_data['weekday']}\nTime: {log_data['time']}"
+               f"Company Name: {log_data['company_name']}\n" \
+               f"Folder Location: {log_data['local_drive_folder_location']}\nDate: {log_data['date']}\n" \
+               f"Weekday: {log_data['weekday']}\nTime: {log_data['time']}"
 
         serial_no = all_log_info.index(x) + 1
         if int(f"{serial_no / 3:.2f}"[-2]) == 3:
