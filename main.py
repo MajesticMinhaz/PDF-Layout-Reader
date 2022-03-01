@@ -680,10 +680,9 @@ def read_log_file(log_data: dict) -> dict:
             "local_drive_folder_location": decryption_func(key_name="local_drive_folder_location"),
             "date": decryption_func(key_name="date"),
             "time": decryption_func(key_name="time"),
-
             "weekday": decryption_func(key_name="weekday")
         }
-    except TypeError as e:
+    except KeyError as e:
         log_file(f"Tried to open a wrong log file using this application.\nError : {e}", False)
         messagebox.showwarning("Invalid Log file", "Your Log file is Invalid.")
 
