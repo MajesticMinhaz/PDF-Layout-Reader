@@ -517,7 +517,7 @@ def log_file(
                 "username": dict_value_encryption_text_func("username"),
                 "task": cipher_code.encrypt(log_message.encode('utf-8')).decode('utf-8'),
                 "company_name": dict_value_encryption_text_func("company_name"),
-                "local_drive_folder_loc": dict_value_encryption_text_func("local_drive_folder_location"),
+                "local_drive_folder_location": dict_value_encryption_text_func("local_drive_folder_location"),
                 "date": date_time_encryption_text_func(key_name="%d %B, %Y"),
                 "weekday": date_time_encryption_text_func(key_name="%A"),
                 "time": date_time_encryption_text_func(key_name="%I:%M:%S %p")
