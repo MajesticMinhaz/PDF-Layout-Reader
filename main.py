@@ -498,7 +498,7 @@ def log_file(
     data = None
     cipher_code = None
     date_time = datetime.now()
-    log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log_info.json")
+    log_file_path = os.path.join(os.path.abspath(os.getcwd()), "log_info.json")
 
     def date_time_encryption_text_func(key_name: str) -> str:
         return cipher_code.encrypt(date_time.strftime(key_name).encode('utf-8')).decode('utf-8')
