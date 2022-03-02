@@ -823,12 +823,14 @@ def checking_value(
                 elif vat_identifier_flag:
                     if re.search(r"(\d+,)?\d+\.\d+", x):
                         vat_amount = re.search(r"(\d+,)?\d+\.\d+", x).group()
+                        vat_amount = re.sub(",", "", vat_amount)
                         vat_identifier_flag = False
                     else:
                         continue
                 elif total_identifier_flag:
                     if re.search(r"(\d+,)?\d+\.\d+", x):
                         total_amount = re.search(r"(\d+,)?\d+\.\d+", x).group()
+                        total_amount = re.sub(",", "", total_amount)
                     else:
                         continue
         except IndexError as e:
