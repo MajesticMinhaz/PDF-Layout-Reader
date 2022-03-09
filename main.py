@@ -407,7 +407,7 @@ def create_setting_file(
                 "ftp_password": field_value(ftp_password),
                 "ftp_folder_location": field_value(ftp_folder_location)
             }
-
+            correct_username = field_value(username)
             # Deleting all value from current screen
             for delete_field in all_fields:
                 delete_field_value(delete_field)
