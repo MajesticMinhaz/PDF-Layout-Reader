@@ -493,6 +493,7 @@ def write_setting_file_func(
 # Creating Log file
 def log_file(
         log_message: str,
+        username: str = "",
         setting_file: bool = True,
         setting_file_path: str = None,
 ) -> None:
@@ -535,7 +536,7 @@ def log_file(
 
         data = {
             "random": key.decode("utf-8"),
-            "username": encryption_func("Anonymous username"),
+            "username": encryption_func(username),
             "task": encryption_func(log_message),
             "company_name": encryption_func("Anonymous company name"),
             "local_drive_folder_location": encryption_func("Local Drive Folder Location Not Found !"),
@@ -1094,5 +1095,7 @@ if __name__ == "__main__":
     vat = str()
     total = str()
     qr_text = None
+    password = None
+    correct_username = "Anonymous Username"
     language_choice()
     root.mainloop()
