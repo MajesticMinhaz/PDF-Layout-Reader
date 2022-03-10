@@ -33,6 +33,7 @@ from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from tkinter import messagebox
 from tkinter import filedialog
+from configparser import ConfigParser
 
 
 # Basic Widget Class
