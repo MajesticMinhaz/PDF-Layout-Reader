@@ -198,7 +198,17 @@ def functional_screen(
             row=1,
             col=0
         )
-        widget.button(text=close_window_text, command=functional_screen_window.destroy, row=2, col=0)
+        widget.button(
+            text="Change Password",
+            command=lambda: change_password_screen(
+                enter_admin_password_text=enter_admin_password_text,
+                submit_text=submit_text,
+                close_window_text=close_window_text
+            ),
+            row=2,
+            col=0
+        )
+        widget.button(text=close_window_text, command=functional_screen_window.destroy, row=3, col=0)
 
     if language == "Arabic":
         functional_screen_ui(enter_admin_password_text='أدخل كلمة مرور المسؤول :', submit_text='إرسال')
