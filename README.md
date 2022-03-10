@@ -10,11 +10,11 @@ Install PDF Layout Reader and Create QR Code Creator with python (make sure pyth
 
 First, Open your terminal in current path and then copy those code and paste in terminal :-
 ```bash
-    pip install requests pdftotext qrcode python-dotenv cryptography PyPDF2
+    pip install requests pdftotext qrcode python-dotenv cryptography PyPDF2 configparser
 ```
 If you are using python3 version then you can try it :-
 ```bash
-    pip3 install requests pdftotext qrcode python-dotenv cryptography PyPDF2
+    pip3 install requests pdftotext qrcode python-dotenv cryptography PyPDF2 configparser
 ```
 For run this project you can simply write in terminal like this :
 ```bash
