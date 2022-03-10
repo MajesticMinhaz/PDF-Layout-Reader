@@ -218,6 +218,61 @@ def functional_screen(
         functional_screen_ui(enter_admin_password_text="Enter Admin Password", submit_text="Submit")
 
 
+# Change Password screen for change admin password
+def change_password_screen(
+        enter_admin_password_text: str,
+        submit_text: str,
+        close_window_text: str
+) -> None:
+    global private_path
+    change_password_screen_window = Toplevel(root)
+    change_password_screen_window.resizable(False, False)
+
+    widget = Widget(master=change_password_screen_window, frame_text=enter_admin_password_text)
+    current_password = widget.edit_text(label_text="Current Password", width=30, row=0, show="*")
+    update_password = widget.edit_text(label_text="New Password", width=30, row=1, show="*")
+    text = widget.label(label_text="", row=2, col=1)
+
+    def checking_password(current_passwrd: Entry, update_passwrd: Entry) -> None:
+        if is_empty(current_passwrd):
+            text.config(text="Current password can\'t be empty")
+            log_file("Attempted to change password with blank current password", correct_username, False)
+            delete_field_value(current_passwrd)
+        elif is_empty(update_passwrd):
+            text.config(text="New password can\'t be empty")
+            log_file("Attempted to change password with blank new password", correct_username, False)
+            delete_field_value(update_passwrd)
+        elif len(field_value(current_passwrd)) < 8 or len(field_value(update_passwrd)) < 8:
+            text.config(text="Length of Password should be at least 8")
+            log_file("Attempted to change password using less than 8 characters.", correct_username, False)
+        elif field_value(current_passwrd) == field_value(update_passwrd):
+            text.config(text="Both passwords can not be the same.")
+            log_file("Attempted to change password using same passwords !", correct_username, False)
+            delete_field_value(current_passwrd)
+            delete_field_value(update_passwrd)
+        elif field_value(current_passwrd) == private_decryption()[1]:
+            private_encryption(correct_username, field_value(update_password))
+            text.config(text="Successfully Updated Password")
+            log_file("Successfully Created a new password !", correct_username, False)
+            delete_field_value(current_passwrd)
+            delete_field_value(update_passwrd)
+            change_password_screen_window.destroy()
+            messagebox.showinfo("Password Changed !", "Password Changed successfully !")
+        else:
+            text.config(text="Something went wrong !")
+            log_file("Attempted to change password with invalid input !", correct_username, False)
+            delete_field_value(current_passwrd)
+            delete_field_value(update_passwrd)
+
+    widget.button(
+        text=submit_text,
+        command=lambda: checking_password(
+            current_password,
+            update_password
+        ), row=3, col=0, width=15)
+    widget.button(text=close_window_text, command=change_password_screen_window.destroy, row=3, col=2, width=15)
+
+
 # Admin Login screen for Create setting file
 def admin_login_screen(
         enter_admin_password_text: str,
@@ -225,6 +280,7 @@ def admin_login_screen(
         close_window_text: str,
         language: str
 ) -> None:
+    global private_path
     admin_login_screen_window = Toplevel(root)
     admin_login_screen_window.resizable(False, False)
 
@@ -241,11 +297,11 @@ def admin_login_screen(
             text.config(text="Length of Password should be at least 8")
             log_file("Attempted to proceed with password less than 8 characters", correct_username, False)
             delete_field_value(passwd)
-        elif len(field_value(passwd)) == 8 and field_value(passwd) != "12345678":
+        elif len(field_value(passwd)) >= 8 and field_value(passwd) != private_decryption()[1]:
             text.config(text="Wrong Password ! Try Again !")
             log_file("Attempted to proceed with incorrect password", correct_username, False)
             delete_field_value(passwd)
-        elif len(field_value(passwd)) == 8 and field_value(passwd) == "12345678":
+        elif len(field_value(passwd)) >= 8 and field_value(passwd) == private_decryption()[1]:
             log_file("Password authentication completed successfully", correct_username, False)
             text.config(text="Successfully logged in.")
             delete_field_value(passwd)
@@ -418,7 +474,6 @@ def create_setting_file(
                 "ftp_password": field_value(ftp_password),
                 "ftp_folder_location": field_value(ftp_folder_location)
             }
-            correct_username = field_value(username)
             # Deleting all value from current screen
             for delete_field in all_fields:
                 delete_field_value(delete_field)
@@ -447,6 +502,7 @@ def create_setting_file(
 def write_setting_file_func(
         values: dict
 ) -> None:
+    global correct_username
     # creating key
     key = Fernet.generate_key()
     cipher_code = Fernet(key)
@@ -489,7 +545,12 @@ def write_setting_file_func(
     with open(path, 'w') as write:
         write.write(template)
         write.close()
-
+    correct_username = values["username"]
+    private_encryption(correct_username, private_decryption()[1])
+    log_file(
+        log_message=f"Successfully Switched to new User. Username : {correct_username}",
+        setting_file_path=f"{values['local_drive_folder_location']}"
+    )
     log_file(
         log_message=f"Successfully Created a new Setting file. File Location : {values['local_drive_folder_location']}",
         setting_file_path=f"{values['local_drive_folder_location']}"
@@ -938,8 +999,8 @@ def checking_value(
             pdf.save()
 
             # read qr_code.pdf file
-            f = open(qr_code_pdf_file_path, 'rb')
-            qr_code_file = PdfFileReader(f)
+            read_qr_code_file = open(qr_code_pdf_file_path, 'rb')
+            qr_code_file = PdfFileReader(read_qr_code_file)
 
             # output file ready
             output_file = PdfFileWriter()
@@ -963,7 +1024,7 @@ def checking_value(
             )
             with open(output_file_name, "wb") as outputStream:
                 output_file.write(outputStream)
-            f.close()
+            read_qr_code_file.close()
             input_pdf_file.close()
             os.remove(image_path)
             os.remove(qr_code_pdf_file_path)
@@ -1087,6 +1148,32 @@ def upload_ftp_server(file_path: str, setting_file_path: str) -> None:
         pass
 
 
+def private_encryption(*args: str) -> None:
+    global private_path
+    key = Fernet.generate_key()
+    cipher_code = Fernet(key)
+    admin_username = cipher_code.encrypt(args[0].encode("utf-8")).decode("utf-8")
+    admin_password = cipher_code.encrypt(args[1].encode("utf-8")).decode("utf-8")
+    private_info = f'[user_info]\nRANDOM={key.decode("utf-8")}\nADMIN_USERNAME={admin_username}\nPASS={admin_password}'
+    with open(private_path, 'w') as write_private_file:
+        write_private_file.write(private_info)
+        write_private_file.close()
+
+
+def private_decryption() -> list:
+    global private_path
+    config = ConfigParser()
+    config.read(private_path)
+    key = config['user_info']['RANDOM'].encode('utf-8')
+    cipher_code = Fernet(key)
+
+    # decryption shortcut function
+    def decryption_func(key_name: str) -> str:
+        return cipher_code.decrypt(bytes(config['user_info'][key_name], 'utf-8')).decode('utf-8')
+
+    return [decryption_func('ADMIN_USERNAME'), decryption_func('PASS')]
+
+
 if __name__ == "__main__":
     root = Tk()
     root.title("QR Invoice APP")
@@ -1106,7 +1193,11 @@ if __name__ == "__main__":
     vat = str()
     total = str()
     qr_text = None
-    password = None
-    correct_username = "Anonymous Username"
+    private_path = os.path.join(os.path.abspath(os.getcwd()), "private.ini")
+    if os.path.isfile(private_path):
+        pass
+    else:
+        private_encryption("root", "12345678")
+    correct_username = private_decryption()[0]
     language_choice()
     root.mainloop()
